@@ -4,6 +4,18 @@ Javascript is primarily client side language which gets executed on webpages to 
 
 ECMAScript is Object Oriented Language with the prototype-based organization, having the concept of an object as its core abstraction
 
+Javascript code is actually get executed by Javascript Engine which is a program or an interpreter. In earlier day it acts like a standard interpreter but nowdays most of them uses JIT (Just in Time) compiler where the javascript code compiles Javascript code to bytecode. Example: V8, Rhino, SpiderMoney, JavaScriptCore, KJS, Chakra, Nashorn, JerryScript. Now engine is obviously not written in javascript but in case of V8 it is written in C++. In case of V8 the Javascript execution is different. It first compiles Javascript code into machine code by implemented JIT compiler (same as Rhino and SpiderMoney does) but it does not create byte code or intermediate code.
+
+At this level engine (V8 in this example) runs multiple thread for optimization. Main thread will obviously do the tradional work: Fetch, Compile, Execute but other threads like Profiler thread tell runtime on which methods it will spend a lot of time and so that different compiler can optimize it (In V8 2 different compilers used for this reason). After optimization compilation to machine code takes place.
+
+```
+This parts need more info and I am lost here
+```
+
+#### Javascript runtime
+
+Now besides engine there are other things working too like Web APIs which we use and other supports like Concurrency and the even loop.
+
 ### An Object
 
 > Ref to the Legendary blog:
@@ -131,18 +143,32 @@ Here class based inheritance is implemented on top of the prototype based delega
 
 ### Execution Context Stack
 
-Every code is evaluated in its execution context and by EC we talk about the properites/methods in which Javascript code has access. Generally there are 3 types of ECMAScript code used:
+Every code is evaluated in its execution context and by EC we talk about the properites/methods in which Javascript code has access. In simpler words it is the internal javascript construct to track execution of a function or the global code which is defined by the ECMAScript spec. At the same time we refer it as an environment in which javascript code is executed. Generally there are 3 types of ECMAScript code used:
+
+Keywords: Control flow and order of execution
 
 1. Global code - There is always 1 global context
 2. Function Code - For every call of a function there is new function execution context
 3. Eval code - For each call of `eval` function there is new `eval` execution context
+
+Later in ES2015+ there is another code type introduced which is:<br>
+4. Module code
 
 Now execution context may activate another context like function calling another function and this is handled by execution context stack.<br>
 Context which activate another context is called `caller` and the one which is being called is `callee`. Whenever a caller activates a callee then the caller suspends its execution and passes the control flow to the callee. Now Callee is pushed onto the stack and become running execution context. Once it ends, it returns control to the caller.
 
 In ECMAScript, the program runtime is presented as the execution context (EC) stack where top of the stack is an active context.<br>
 
-An execution context can be represented as a simple object with properties which is called as context state to track the execution progress by:
+Now one good question which can be asked is why stack is used in Javascript ? Well thats because Javascript is a <b>single threaded environment</b> and only one code is execute at a time.
+
+Personal note: ES6 feature update i guess:<br>
+Every execution context has an associated lexical environment.
+
+> Lexical environment: A lexical environment is a structure used to define association between identifiers appearing in the context with their values. Each environment can have a reference to an optional parent environment.
+
+In short environment is a storage of variables, functions and classes defined in a scope.
+
+Now during ES3, An execution context can be represented as a simple object with properties which is called as context state to track the execution progress.
 
 #### 1. Variable Object: vars, function declarations (no expressions), arguments<br>
 > A variable object is a container of data associated with the execution context. It’s a special object that stores variables and function declarations defined in the context.
@@ -317,6 +343,21 @@ It is the property of execution context (not variable object) but in ES6 it beca
 
 In case of function context it is different it depends on the caller.
 
+### Conclusion
+
+It is hard to handle so many information and at the same time one question might rise which is:
+
+> What's the difference in call stack and execution context stack
+
+For now I believe that they are same (TODO: In doubt). So we know that Global scope is what which is created first internally by Javascript and it is our first execution context. Each execution context will have 4 main things as of latest ECMAScript:
+
+1. thisValue binding
+2. Variable Environments
+3. Lexical Environments
+4. Declaration binding
+
+Stacking occurs whenever you call a function or eval and even a recursive function created execution context.
+
 ### Javascript is 2-pass Read
 
 Javascript first parse the code, collects function definitions, hoist variables and at second pass it actually executes the code.<br>
@@ -387,6 +428,10 @@ https://www.quirksmode.org/js/intro.html
 https://appendto.com/2016/10/javascript-functions-as-first-class-objects/
 http://dmitrysoshnikov.com/ecmascript/javascript-the-core/
 http://dmitrysoshnikov.com/ecmascript/javascript-the-core-2nd-edition/
+https://blog.sessionstack.com/how-javascript-works-inside-the-v8-engine-5-tips-on-how-to-write-optimized-code-ac089e62b12e
+https://medium.com/@js_tut/execution-context-the-call-stack-d1fbe34f6fe9
+https://hackernoon.com/execution-context-in-javascript-319dd72e8e2c
+https://blog.sessionstack.com/how-does-javascript-actually-work-part-1-b0bacc073cf
 
 [Social Links]<br>
 https://www.quora.com/What-is-the-difference-between-javascript-engine-and-javascript-runtime
