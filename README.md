@@ -6,6 +6,10 @@ ECMAScript is Object Oriented Language with the prototype-based organization, ha
 
 Javascript code is actually get executed by Javascript Engine which is a program or an interpreter. In earlier day it acts like a standard interpreter but nowdays most of them uses JIT (Just in Time) compiler where the javascript code compiles Javascript code to bytecode. Example: V8, Rhino, SpiderMoney, JavaScriptCore, KJS, Chakra, Nashorn, JerryScript. Now engine is obviously not written in javascript but in case of V8 it is written in C++. In case of V8 the Javascript execution is different. It first compiles Javascript code into machine code by implemented JIT compiler (same as Rhino and SpiderMoney does) but it does not create byte code or intermediate code.
 
+Abstract Syntax Tree is also one of the main goal of V8 when doing parsing.
+
+> Better exlanation here: http://thibaultlaurens.github.io/javascript/2013/04/29/how-the-v8-engine-works/
+
 At this level engine (V8 in this example) runs multiple thread for optimization. Main thread will obviously do the tradional work: Fetch, Compile, Execute but other threads like Profiler thread tell runtime on which methods it will spend a lot of time and so that different compiler can optimize it (In V8 2 different compilers used for this reason). After optimization compilation to machine code takes place.
 
 ```
@@ -15,6 +19,16 @@ This parts need more info and I am lost here
 #### Javascript runtime
 
 Now besides engine there are other things working too like Web APIs which we use and other supports like Concurrency and the even loop.
+
+1. The Call Stack
+
+one thread == one call stack == one thing at a time
+
+But what if some process happens which takes time or blocking it. To avoid this we have webapi's available by browser. At the same time we have event loop and task queue. `TODO: Not sure where event loop and task queue reside`. Event loop push only when stack is empty. AJAX request which we made also reside in webapis rather than the javascript itself. Also let's say we have on click event then that is webapis event and on click it will push defined process in the queue and that's how it gets pushed in stack and get executed.
+
+> Don't block the event loop
+
+There is another thing called render queue, browser repaints it to re-render it. But with your javascript code you might make it block by writing code and blocking event loop. So it's better to queue up those events.
 
 ### An Object
 
@@ -424,14 +438,19 @@ Side videos:
 Reference:
 
 [Links]<br>
-https://www.quirksmode.org/js/intro.html
-https://appendto.com/2016/10/javascript-functions-as-first-class-objects/
-http://dmitrysoshnikov.com/ecmascript/javascript-the-core/
-http://dmitrysoshnikov.com/ecmascript/javascript-the-core-2nd-edition/
-https://blog.sessionstack.com/how-javascript-works-inside-the-v8-engine-5-tips-on-how-to-write-optimized-code-ac089e62b12e
-https://medium.com/@js_tut/execution-context-the-call-stack-d1fbe34f6fe9
-https://hackernoon.com/execution-context-in-javascript-319dd72e8e2c
-https://blog.sessionstack.com/how-does-javascript-actually-work-part-1-b0bacc073cf
+https://www.quirksmode.org/js/intro.html<br>
+https://appendto.com/2016/10/javascript-functions-as-first-class-objects/<br>
+http://dmitrysoshnikov.com/ecmascript/javascript-the-core/<br>
+http://dmitrysoshnikov.com/ecmascript/javascript-the-core-2nd-edition/<br>
+https://blog.sessionstack.com/how-javascript-works-inside-the-v8-engine-5-tips-on-how-to-write-optimized-code-ac089e62b12e<br>
+https://medium.com/@js_tut/execution-context-the-call-stack-d1fbe34f6fe9<br>
+https://hackernoon.com/execution-context-in-javascript-319dd72e8e2c<br>
+https://blog.sessionstack.com/how-does-javascript-actually-work-part-1-b0bacc073cf<br>
+http://thibaultlaurens.github.io/javascript/2013/04/29/how-the-v8-engine-works/<br>
+https://medium.freecodecamp.org/whats-the-difference-between-javascript-and-ecmascript-cba48c73a2b5
+
+https://www.youtube.com/watch?v=8aGhZQkoFbQ<br>
+(Thanks to https://stackoverflow.com/questions/54503435/whats-the-order-of-execution-of-javascript-code-internally#comment95810892_54503435)
 
 [Social Links]<br>
 https://www.quora.com/What-is-the-difference-between-javascript-engine-and-javascript-runtime
