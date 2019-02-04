@@ -18,7 +18,7 @@ This parts need more info and I am lost here
 
 #### Javascript runtime
 
-Now besides engine there are other things working too like Web APIs which we use and other supports like Concurrency and the even loop.
+Now besides engine there are other things working too like Web APIs which we use and other supports like Concurrency and the event loop.
 
 1. The Call Stack
 
@@ -168,19 +168,12 @@ Keywords: Control flow and order of execution
 Later in ES2015+ there is another code type introduced which is:<br>
 4. Module code
 
-Now execution context may activate another context like function calling another function and this is handled by execution context stack.<br>
+Now execution context may activate another context like function calling another function and this is handled by execution context stack which corresponds to the generic concept of a call-stack.<br>
 Context which activate another context is called `caller` and the one which is being called is `callee`. Whenever a caller activates a callee then the caller suspends its execution and passes the control flow to the callee. Now Callee is pushed onto the stack and become running execution context. Once it ends, it returns control to the caller.
 
 In ECMAScript, the program runtime is presented as the execution context (EC) stack where top of the stack is an active context.<br>
 
 Now one good question which can be asked is why stack is used in Javascript ? Well thats because Javascript is a <b>single threaded environment</b> and only one code is execute at a time.
-
-Personal note: ES6 feature update i guess:<br>
-Every execution context has an associated lexical environment.
-
-> Lexical environment: A lexical environment is a structure used to define association between identifiers appearing in the context with their values. Each environment can have a reference to an optional parent environment.
-
-In short environment is a storage of variables, functions and classes defined in a scope.
 
 Now during ES3, An execution context can be represented as a simple object with properties which is called as context state to track the execution progress.
 
@@ -228,7 +221,102 @@ So our AO of the `foo` function will have:
 2. Special arguments: arguments with value `{0: 10, 1: 20, ...}` with index properties
 3. Declarations: variable `z` with value 30 and function bar as reference.
 
-#### 2. Scope Chain: variable objects and all parent scopes
+### 1.2 Environment
+
+Personal note: ES6 feature update i guess:<br>
+Every execution context has an associated lexical environment.
+
+> Lexical environment: A lexical environment is a structure used to define association between identifiers appearing in the context with their values. Each environment can have a reference to an optional parent environment.
+
+In short environment is a storage of variables, functions and classes defined in a scope. But technically an environment is a pair, consisting of an environment record (actual storage which maps identifiers and values) and reference to the parent. So lets say if I have function Foo with variables then function will have 1 environment with variables in EnvironmentRecord which will be referenced by Foo environment object and it will have parent referencing to the global environment object.
+
+Just like prototype chain here we have identifiers resolution based on parent. Now environments records can be of different type:
+
+1. Object Environment Records: Appeared in global context and inside the `with` statement
+2. Declarative Environment Records: Function Environment Records & Module Environment Records
+
+Object Environment Records can be record of global environment. Also Objectenv records do have associated binding object which may store some properties from the record. It can be provided as `this` value.
+
+Example:
+
+```
+var x = 10; // Legacy variables
+let y = 20; // Modern variables
+
+console.log(this.x, this.y) // this.y is undefined but x is accessable
+this['not valid ID'] = 30 // Can be accessed by this
+```
+
+So here the Global Environment will have Object Environment records and this will have binding object refering to the Global binding object consisting of variable `x` and `not valid id`. Here x is accessable by both object enviornment record and binding object. Thats because earlier we saw that execution context was represented by Variable Object/Activation object and it was originally a part of 1 simple object but later in ES6 we started using environments.
+
+Here Declarative environment record act like an activation object which we saw in ES3. In general case they are assumed to be stored directly at low level of the implementation like in registers of virtual machine for fast access). This is the main difference for implementing it. This means that specification doesn't require and recommend to implement declarative records as simple objects which is obviously inefficient. So these records are not assumed to be exposed directly to the user level which we cannot access these bindings as properties of the record. Even in ES3 we were not able to access them by activation object but Rhino implementation was exception where we could have used `__parent__` property).
+
+So what they changed is that declarative records allow to use complete lexical addressing technique. This allowed to have direct access to the variables without any scope chain lookup regardless the depth of the nested scope (generally all variable addresses can be known even at compile time if storage is fixed). So why ? Because of efficiency.
+
+Also fun fact is that Brendan Eich mentioned that the activation object implementation in ES3 was just a bug. So we have environment rather than object which have environmentRecord rather than variable/activatin object which can be either declarative or object environment record.
+
+<b>Fact :</b> `with` statement is executed in a new lexical environment same with the `catch` clause when we do `try { throw 20; } catch (e) { console.log(e) }` because of this ES5 strict might have removed `with` statement.
+
+Now structure of execution context as of by ES5 is:
+
+1. ThisBinding
+2. Variable Environment
+3. Lexical Environment
+
+Here Variable environment is exactly the initial storage of variables and functions of the context and environment records is used to do that.<br>
+Random Function Variable Environment:<br>
+  has environmentRecord:<br>
+    has arguments as `{0: 1, 1: 2, 2: 3, length: 3, callee: Random Function}<br>
+    has parameters as `a: 1, b: 2, c: 3`<br>
+  has outer/parent<br>
+
+Now lexical Environment is just the copy of variable environment but the difference is hard to visualize. To understand this we need to first see that the `with` statement and `catch` clause as we see usually replace the context's environment for the time of execution and at the same time we know that closure saves the lexical environment of the context which it is created.
+
+Because there is possibiltiy of calling function declaration inside the `with` statement due to which is should originially use binding values from initial state and any function expression used inside `with` statement should be able to use the replaced lexical environment.
+
+> This is why, closures formed as function declarations (FD) save the VariableEnvironment component as their [[Scope]] property, and function expressions (FE) save exactly LexicalEnvironment component in this case. This is the main (and actually the only) reason of separation of these two, at first glance the same, components.
+
+Example:
+
+```
+var a = 10;
+// Function Declaration
+function foo() {
+  console.log(a);
+}
+with ({a: 20}) { // New Lexical environment
+  // FE
+  var bar = function () {
+    console.log(a);
+  };
+  foo(); // 10!, from VariableEnvrionment
+  bar(); // 20,  from LexicalEnvrionment
+} // Lexical Environment Restored
+foo(); // 10
+bar(); // still 20
+```
+
+One question might raised is that How `bar()` is able to execute outside the `with` statement ? Well thats because it is function-scoped not block-scoped and because of `var` usasge it is hoisted.
+
+> TODO:
+```
+(function() {
+  var x = 10;
+  let y = 20;
+   
+  eval('var z = x + y; let m = 100;');
+  
+  console.log(z); // 30
+  console.log(m); // ReferenceError
+})();
+```
+
+Now in ES6 they standardize block level function declarations and hence any function inside `with` statement will capture the lexical environment
+
+<br>Note: </b> LexicalEnvironment component participates in the process of identifier resolution.
+
+
+#### 2. Scope Chain: variable objects and all parent scopes <b>later replaced by environments</b>
 
 > A scope chain is a list of objects that are searched for identifiers appear in the code of the context.
 
@@ -269,6 +357,8 @@ Also when any context ends then all the state and itself gets destroyed. But we 
 
 #### Closures | Solving 2 Funarg problem
 
+> Closure: A closure is a function which captures the environment where it’s defined. Further this environment is used for identifier resolution.
+
 Concept related with scope chain
 
 First problem is "Upward funarg problem"<br>
@@ -290,6 +380,11 @@ returnedFunction(); // Output 10 but not 20
 ```
 
 This scope is static scope or lexical scope because variable was found in `[[Scope]]` first.<br>
+
+> Static scope: a language implements static scope, if only by looking at the source code one can determine in which environment a binding is resolved.
+
+Since static scope is also referred as lexical scope, hence the lexical environments were introducted
+
 Second problem is "Downward funarg problem"<br>
 > Parent context may exist but may be an ambiguity with resolving an identifier. In short which scope of value should be used, statically saved or dynamically created.
 
@@ -351,11 +446,67 @@ But now in ES6 if we simply write `let data = []` with `let k = 0` then this int
 
 #### 3. thisValue: Context object
 
+> This: an implicit context object accessible from a code of an execution context — in order to apply the same code for multiple objects.
+
 > A this value is a special object which is related with the execution context. Therefore, it may be named as a context object (i.e. an object in which context the execution context is activated).
 
 It is the property of execution context (not variable object) but in ES6 it became a property of lexical environment means property of variable object to support arrow function. In global context `this` value is the global object itself, that means `this` value here equals to variable object itself (x, this.x, window.x).
 
 In case of function context it is different it depends on the caller.
+
+This case can be easily understood by class based OOP concept. When we create an class based object and when we call the method then at that point the object name is our `this` value means the function environment record gets the [[ThisValue]] passed.
+
+Another usage is generic interface function which be used in mixins or traits.
+
+Example:
+
+```
+// Generic Movable interface (mixin).
+let Movable = {
+  /**
+   * This function is generic, and works with any
+   * object, which provides `_x`, and `_y` properties,
+   * regardless of the class of this object.
+   */
+  move(x, y) {
+    this._x = x;
+    this._y = y;
+  },
+};
+let p1 = new Point(1, 2);
+// Make `p1` movable.
+Object.assign(p1, Movable);
+// Can access `move` method.
+p1.move(100, 200);
+console.log(p1.getX()); // 100
+```
+
+> The arrow functions are special in terms of this value: their this is lexical (static), but not dynamic. I.e. their function environment record does not provide this value, and it’s taken from the parent environment.
+
+### Realm
+
+Before we execute anything, all ECMAScript code must be associated with a realm. It's just provide a global environment for a context.
+
+> A code realm is an object which encapsulates a separate global environment.
+
+In current version we can't explicitly create realms but they can be created implicitly by the implementation. It's just like iframe in web and sandbox of the vm module in Node.jso
+
+### Job
+
+> Job: A job is an abstract operation that initiates an ECMAScript computation when no other ECMAScript computation is currently in progress.
+
+Jobs are enqueued on the job queue and they are of 2 types:
+
+1. ScriptJobs: Manages script
+2. PromiseJobs: Just like task queue but hadle promises and async function
+
+All these jobs are handled by the abstraction knwn as the Event loop.
+
+### Agent
+
+> Agent: An agent is an abstraction encapsulating execution context stack, set of job queues, and code realms.
+
+Each agent is isolated and share messages by `SharedArrayBuffer` in caseif they want to do it.
 
 ### Conclusion
 
@@ -447,7 +598,8 @@ https://medium.com/@js_tut/execution-context-the-call-stack-d1fbe34f6fe9<br>
 https://hackernoon.com/execution-context-in-javascript-319dd72e8e2c<br>
 https://blog.sessionstack.com/how-does-javascript-actually-work-part-1-b0bacc073cf<br>
 http://thibaultlaurens.github.io/javascript/2013/04/29/how-the-v8-engine-works/<br>
-https://medium.freecodecamp.org/whats-the-difference-between-javascript-and-ecmascript-cba48c73a2b5
+https://medium.freecodecamp.org/whats-the-difference-between-javascript-and-ecmascript-cba48c73a2b5<br>
+http://dmitrysoshnikov.com/ecmascript/es5-chapter-3-2-lexical-environments-ecmascript-implementation/#variable-environment
 
 https://www.youtube.com/watch?v=8aGhZQkoFbQ<br>
 (Thanks to https://stackoverflow.com/questions/54503435/whats-the-order-of-execution-of-javascript-code-internally#comment95810892_54503435)
@@ -462,3 +614,8 @@ http://sd.blackball.lv/library/JavaScript_Patterns_%282010%29.pdf
 
 1. Read about Parser for better understanding
 2. Create VO/AO diagram for example of for loop in javascript
+
+
+### My views:
+
+Internet is flooded with tutorials and yet very less meaningful and structured information can be found
