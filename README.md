@@ -236,7 +236,7 @@ So our AO of the `foo` function will have:
 
 > A scope chain is a list of objects that are searched for identifiers appear in the code of the context.
 
-It is important because of nested functions usage. It is similar to prototype chain where if variable is not found in current scope (in it's own variable/activation object) then the lookup proceeds to its parent variable/activation object and repeats itself until it finds it else it is `undefined`. In contexts in function refers in its code the identifier (name of var, FD, formal parameters) which is not local then it is called a free variable and to search these free variables exactly a scope chain is used.
+It is important because of nested functions usage. It is similar to prototype chain where if variable is not found in current scope (in it's own variable/activation object) then the lookup proceeds to its parent variable/activation object and repeats itself until it finds it else it is `undefined`. In contexts when a function refers in its code the identifier (name of var, FD, formal parameters) which is not local then it is called a free variable and to search these free variables exactly a scope chain is used.
 
 Example:
 ```
@@ -258,7 +258,7 @@ Now since they all are object, they may also have prototypes and prototype chain
 
 #### Note: Global variable object usually inherit from `Object.prototype` object hence Global VO `__proto__` refer to the `Object.prototype` (In case of SpiderMonkey but for different case it might inherit from something else).
 
-Right now we understood that object can inherit values from another object and at the same time have scope. So the question arises is which will be looked first when asked. Whenever any variable is invoked then it is looked at `__proto__` first and then `__parent__`. So if we write something like:
+Right now we understood that object can inherit values from another object and at the same time have scope. So the question arises is which property/method will be looked-up first when asked. Whenever any variable is invoked then it is looked at `__proto__` first and then `__parent__`. So if we write something like:
 ```
   with ({z: 50}) {
     console.log(x, z);
@@ -372,7 +372,7 @@ In short environment is a storage of variables, functions and classes defined in
 Just like prototype chain here we have identifiers resolution based on parent. Now environments records can be of different type:
 
 1. Object Environment Records: Appeared in global context and inside the `with` statement
-2. Declarative Environment Records: Function Environment Records & Module Environment Records
+2. Declarative Environment Records: Function Environment Records & Module Environment Records (Function Declaration, Variable Declaration and Catch)
 
 Object Environment Records can be record of global environment. Also Objectenv records do have associated binding object which may store some properties from the record. It can be provided as `this` value.
 
@@ -399,8 +399,8 @@ Also fun fact is that Brendan Eich mentioned that the activation object implemen
 Now structure of execution context as of by ES5 is:
 
 1. ThisBinding
-2. Variable Environment
-3. Lexical Environment
+2. Variable Environment: holds binding created by VariableStatement and FunctionDeclaration within the execution context
+3. Lexical Environment: Generally used to resolve identifier references made by code within the execution context
 
 Here Variable environment is exactly the initial storage of variables and functions of the context and environment records is used to do that.<br>
 Random Function Variable Environment:<br>
@@ -410,6 +410,8 @@ Random Function Variable Environment:<br>
   has outer/parent<br>
 
 Now lexical Environment is just the copy of variable environment but the difference is hard to visualize. To understand this we need to first see that the `with` statement and `catch` clause as we see usually replace the context's environment for the time of execution and at the same time we know that closure saves the lexical environment of the context which it is created.
+
+Also note that the value of VariableEnvironment component never changes while the value of LexicalEnvironment component may change during execution of code.
 
 Because there is possibiltiy of calling function declaration inside the `with` statement due to which is should originially use binding values from initial state and any function expression used inside `with` statement should be able to use the replaced lexical environment.
 
@@ -611,6 +613,7 @@ https://blog.sessionstack.com/how-does-javascript-actually-work-part-1-b0bacc073
 http://thibaultlaurens.github.io/javascript/2013/04/29/how-the-v8-engine-works/<br>
 https://medium.freecodecamp.org/whats-the-difference-between-javascript-and-ecmascript-cba48c73a2b5<br>
 http://dmitrysoshnikov.com/ecmascript/es5-chapter-3-2-lexical-environments-ecmascript-implementation/#variable-environment
+http://www.ecma-international.org/ecma-262/
 
 https://www.youtube.com/watch?v=8aGhZQkoFbQ<br>
 (Thanks to https://stackoverflow.com/questions/54503435/whats-the-order-of-execution-of-javascript-code-internally#comment95810892_54503435)
