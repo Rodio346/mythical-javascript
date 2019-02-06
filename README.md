@@ -275,6 +275,8 @@ Also when any context ends then all the state and itself gets destroyed. But we 
 
 > Closure: A closure is a function which captures the environment where it’s defined. Further this environment is used for identifier resolution.
 
+> A closure is a pair consisting of the function code and the environment in which the function is created.
+
 Concept related with scope chain
 
 First problem is "Upward funarg problem"<br>
@@ -376,6 +378,46 @@ Just like prototype chain here we have identifiers resolution based on parent. N
 
 Object Environment Records can be record of global environment. Also Objectenv records do have associated binding object which may store some properties from the record. It can be provided as `this` value.
 
+Now generally these environment records have methods defined. Some of these Abstract methods are:
+
+1. HasBinding(N)
+2. CreateMutableBinding(N,D): Here N is the text of the bound name and if D is true then the binding may be subsequently deleted
+3. CreateImmutableBinding(N, S): If S is true then exception is always raied, mostly TypeError
+4. InitializeBinding(N, V): N is our name with V as value
+5. SetMutableBinding(N, V, S): Set value V to the N. If S is true then for immutable objects it will throw TypeError.
+6. GetBindingValue(N, S): If S is True then exception is thrown which is ReferenceError if no binding exist
+7. DeleteBinding(N)
+
+In SetMutableBinding there is an algorithm which is used:
+
+1. We assume that the envRec is our declarative Environment Record for which the method was invoked
+2. If envRec have no binding for N, means no variable is there then
+
+If S is true we throw ReferenceError exception generally happens for case:
+`function f(){eval("var x; x = (delete x, 0);")}`
+
+Else perform `envRec.CreateMutableBinding(N, true)` and then perform `envRec.InitializeBinding(N, V)` then return normal completion.<br>
+Else if binding is present and it is mutable binding then change its value to V else it is an immutable binding and throw TypeError.
+
+Now a Function Environment record is a declarative Environment Record which is used to represent the top-level scope of a function and if the function is not an ArrowFunction then it provides a `this` binding. Additional state fields of Function Environment Records are:
+
+1. [[ThisValue]]
+2. [[ThisBindingStatus]] - It can be either Lexical (If it is an ArrowFunction and have no local this value) or initialized and uninitialized
+3. [[FunctionObject]] - Which invocation cased this Environment Record to be created
+4. [[HomeObject]] - Naturally it in undefined but if super property is there and it is not an ArrowFunction then HomeObject is the object bound to as a method.
+5. [[NewTarget]] - Its an Object if it is created by Construct internal method else it is undefined.
+
+Now this Environment Record has similar methods as we discussed earlier except HasThisBinding and HasSuperBinding.
+
+Beside this we have Global Environment Record which is used to represent the outer most scope that is shared by all of the ECMAScript Script elemetns that are processed in a common realm. It provides the built-in globals, properites of the global object and all top level declaration. It is logically a single record but it is specified as an encapsulation of Object and Declarative environment record. It also has its base object and the value returned by it is the the global environment record GetThisBinding method. Fields with GER have besides previous methods are:
+
+1. [[ObjectRecord]]: Which is our Binding Object and it is our global bject. It contains global built-ins bindings as well as all declarations.
+2. [[GlobalThisValue]]: this value
+3. [[DeclarativeRecord]]: All declarations except FD, GD, VD, AFD, AGD.
+4. [[VarNames]]: List of string containing names of all declarations.
+
+Now there are also Module Environment Records similar to this with different methods.
+
 Example:
 
 ```
@@ -399,7 +441,7 @@ Also fun fact is that Brendan Eich mentioned that the activation object implemen
 Now structure of execution context as of by ES5 is:
 
 1. ThisBinding
-2. Variable Environment: holds binding created by VariableStatement and FunctionDeclaration within the execution context
+2. Variable Environment: holds binding created by VariableStatement and FunctionDeclaration within the execution context (Variable object from ES3)
 3. Lexical Environment: Generally used to resolve identifier references made by code within the execution context
 
 Here Variable environment is exactly the initial storage of variables and functions of the context and environment records is used to do that.<br>
@@ -456,6 +498,84 @@ Now in ES6 they standardize block level function declarations and hence any func
 
 <br>Note: </b> LexicalEnvironment component participates in the process of identifier resolution.
 
+Now generally in most of the language Static scoping is prefered means it will refer to its nearest lexical environment and here the word "lexical" relates to a property of a program text whhere lexically in the souce text a variable appears. But Dynamic scope is also possible with ECMAScript by using `with` and `eval` and because of this in later ES6 `with` statement was removed from strict and `eval` variable declaration will not create variables.
+
+So scope are of 3 types:
+
+1. Static Scope: Implemented by closures, through the mechanism of capturing free variables in the lexical environments
+```
+const x = 10;
+
+function print_x() {
+  console.log(x);
+}
+
+function run() {
+  const x = 20;
+  print_x(); // 10, not 20
+}
+
+run();
+```
+2. Dynamic Scope: If a caller defines an activation environment of a callee then it is Dynamic scope
+```
+function produce() {
+  console.log(this.x);
+}
+
+const alpha = {produce, x: 1};
+const beta  = {produce, x: 2};
+const gamma = {produce, x: 3};
+
+console.log(
+  alpha.produce(), // 1
+  beta.produce(),  // 2
+  gamma.produce(), // 3
+);
+```
+
+3. Runtime Augmented Scope: Activatin frame is not statically determined and can be mutated by the callee itself.
+
+```
+let x = 10;
+
+let o = {x: 30};
+let storage = {};
+
+(function foo(flag) {
+  if (flag == 2) {
+    eval("var x = 20;");
+  }
+
+  if (flag == 3) {
+    storage = o;
+  }
+  with (storage) {
+
+    // "x" may be resolved either
+    // in the global scope - 10, or
+    // in the local scope of a function - 20
+    // (created via "eval" function), or even
+    // in the "storage" object - 30
+
+    console.log(x); // ? - scope of "x" is undetermined at compile time
+  }
+  // organize recursion on 3 calls
+
+  if (flag < 3) {
+    foo(++flag);
+  }
+})(1);
+```
+
+Coming back to C language, over there generally a function was handles using call stack with activation records inside stack to track variables but in case of Javascript we called it activation object as of ES3. Now the problem was that there are closures too in our code, means even if function is ended we still need to save the properties because the returned function might access the parent function data in general. So in stack rather than pushing the data and popping it we push the references. So later we created Environments having properties as:
+
+1. Record pointing to the Environment record
+2. Outer pointing to the parent Environment
+
+Its true that ES6 version removed Scope Chain and Activation object from their Execution Context.
+Now there are time when few variables are not used and it is better to avoid it by avoiding it. So we can make use of Combined environment frame model and generally used by other languages like Python, Ruby etc. If they find that function is not using those variables then it doesn't save it at all. So point is that chained environment frames model optimizes the moment of function creation however at the identifier resolution the whole scope chain should be traversed until the needed binding will be found. But in case of single environment frame it optimizes the execution because all identifiers are resolved in the nearest single frame without long scope chain lookup however requires more complex algorithm of the function creation with parsing all inner function and determining with variables should be saved or not.
+
 
 #### 3. thisValue: Context object
 
@@ -494,6 +614,136 @@ p1.move(100, 200);
 console.log(p1.getX()); // 100
 ```
 
+#### In general `this`
+
+> this is a property of the execution context. It’s a special object in which context a code is executed.
+
+At first you must understand that `this` value in the global code is always the global object. Now that was easy but things are much better in function code<br>
+In function the value of `this` is not statically bound to function. At runtime of the code `this` value is immutable as it is not possible to assign a new value to it since this is not a variable (in case of python it is explicitly defined `self` object which can repeatedly changed at runtime).
+
+Generally the `this` value in function gets affected by:
+1. Caller which activates the code of the context
+2. By the form of a call expresion like how function is called
+
+Example in case of global code a normal function can have different `this` value like:
+
+`foo() // Global`<br>
+`foo.prototype.constructor() // foo.prototype`
+
+Now to understand it fully we need to know about Reference type. Generally a reference type is represented by two properties: base and propertyName. There is also property called "strict" flag in ES5.<br>
+Value of reference type can be only in 2 cases generally:
+
+1. When we deal with an identifier
+2. or with a property accessor
+
+Naturally base value determines the scope like global, foo etc and propertyName is name of the identifier. Example, `var foo = 10` will have base global and propertyName as foo.<br>
+Now property accessor are of 2 types, it can be either dot notation or bracket notation like:
+```
+foo.bar();
+foo['bar']();
+```
+Also to get value of reference type we have GetValue() method which returns the value or the property name if it is a reference. Now the general rule of determining the value `this` is:
+
+> The value of this in a function context is provided by the caller and determined by the current form of a call expression (how the function call is written syntactically).
+
+> If on the left hand side from the call parentheses ( ... ), there is a value of Reference type then this value is set to the base object of this value of Reference type.
+
+> In all other cases (i.e. with any other value type which is distinct from the Reference type), this value is always set to null. But since there is no any sense in null for this value, it is implicitly converted to global object.
+
+Example:
+```
+function foo() {
+  return this;
+}
+foo(); // global
+
+var foo = {
+  bar: function () {
+    return this;
+  }
+};
+foo.bar(); // foo
+```
+
+Left hand side of parentheses there is a Reference type value which has base value global so global will be returned. So here we saw the difference in caller. But if we change the call expression then result will be different like:
+
+```
+var test = foo.bar;
+test(); // global
+```
+
+Here test is identifier and produces other value of Reference type which base is the global object and used as `this` value.
+
+<b>Very important</b>: Note, in the strict mode of ES5 this value is not coerced to global object, but instead is set to undefined.
+
+But if the left side is not of reference type but any other type, then `this` value is set to null and as consequence set to the global object.<br>
+Example:
+```
+(function () {
+  console.log(this); // null => global
+})();
+```
+
+In this case on left side of parenthesis we have function object but not object of Reference type (it is not the identifier and not property accessor), hence null and then global object.<br>
+More example:
+```
+var foo = {
+      bar: function () {
+                   console.log(this);
+                     }
+};
+foo.bar(); // Reference, OK => foo
+(foo.bar)(); // Reference, OK => foo, grouping operator but still gets ReferenceType
+(foo.bar = foo.bar)(); // Assignment operator calls GetValue method
+(false || foo.bar)(); // OR operator forces them to call GetValue method
+(foo.bar, foo.bar)(); // Comma operator forces them to call GetValue method which gets function object which is not of ReferenceType
+```
+There can also be a case when call expression determines on the left hand side of call parentheses the value of reference type but this value is set to null which means global object.
+
+Example:
+```
+function foo() {
+  function bar() {
+    function baz() {
+      console.log(this); // global
+    }
+    console.log(this); // global
+    baz(); // the same as AO.baz()
+  }
+  bar(); // the same as AO.bar()
+}
+```
+
+Since after ES5 we knew that Activation Object is not used so it will be found in function environment record found in lexical environment which is a part of execution context. Exception in `with` statement which shadows the global object properties and creates a new `this` value since new lexical environment is created.
+
+One more case with call of function as the constructor which creates the new `this` value. The `new` operator calls the internal [[Construct]] method of the function which in turn after object creation calls the internal [[Call]] method which creates new `this` value object.
+
+Example:
+```
+function A() {
+      console.log(this); // newly created object, below - "a" object
+        this.x = 10;
+}
+
+var a = new A();
+console.log(a.x); // 10
+```
+Now function have some built-in methods to manipulate the `this` value in function by `call` and `apply` method. Both take first argument as `this` and second value in call can by anything but in `apply` it needs to be an array like object.
+
+Example:
+```
+var b = 10;
+function a(c) {
+      console.log(this.b);
+        console.log(c);
+}
+a(20); // this === global, this.b == 10, c == 20
+a.call({b: 20}, 30); // this === {b: 20}, this.b == 20, c == 30
+a.apply({b: 30}, [40]) // this === {b: 30}, this.b == 30, c == 40
+```
+
+// TODO: Need content for Arrow functions
+
 > The arrow functions are special in terms of this value: their this is lexical (static), but not dynamic. I.e. their function environment record does not provide this value, and it’s taken from the parent environment.
 
 ### Realm
@@ -518,6 +768,8 @@ All these jobs are handled by the abstraction knwn as the Event loop.
 ### Agent
 
 > Agent: An agent is an abstraction encapsulating execution context stack, set of job queues, and code realms.
+
+In short Agent comprises a set of ECMAScript execution contexts, an exxecution context stack, a running execution context, a set or named job queues, Agent Record and an executing thread.
 
 Each agent is isolated and share messages by `SharedArrayBuffer` in caseif they want to do it.
 
@@ -612,8 +864,9 @@ https://hackernoon.com/execution-context-in-javascript-319dd72e8e2c<br>
 https://blog.sessionstack.com/how-does-javascript-actually-work-part-1-b0bacc073cf<br>
 http://thibaultlaurens.github.io/javascript/2013/04/29/how-the-v8-engine-works/<br>
 https://medium.freecodecamp.org/whats-the-difference-between-javascript-and-ecmascript-cba48c73a2b5<br>
-http://dmitrysoshnikov.com/ecmascript/es5-chapter-3-2-lexical-environments-ecmascript-implementation/#variable-environment
-http://www.ecma-international.org/ecma-262/
+http://dmitrysoshnikov.com/ecmascript/es5-chapter-3-2-lexical-environments-ecmascript-implementation/#variable-environment<br>
+http://www.ecma-international.org/ecma-262/<br>
+https://codeburst.io/js-scope-static-dynamic-and-runtime-augmented-5abfee6223fe<br>
 
 https://www.youtube.com/watch?v=8aGhZQkoFbQ<br>
 (Thanks to https://stackoverflow.com/questions/54503435/whats-the-order-of-execution-of-javascript-code-internally#comment95810892_54503435)
