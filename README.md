@@ -8,6 +8,20 @@ Javascript code is actually get executed by Javascript Engine which is a program
 
 Abstract Syntax Tree is also one of the main goal of V8 when doing parsing.
 
+ECMAScript has many specification editions named:
+
+ES1 - 1997<br>
+ES2 - 1998<br>
+ES3 - 1999<br>
+ES4 - Abandoned<br>
+ES5 - 2009<br>
+ES6 - 2015<br>
+ES7 - 2016<br>
+ES8 - 2017<br>
+ES9 - 2018<br>
+ES10 - 2019<br>
+
+
 > Better exlanation here: http://thibaultlaurens.github.io/javascript/2013/04/29/how-the-v8-engine-works/
 
 At this level engine (V8 in this example) runs multiple thread for optimization. Main thread will obviously do the tradional work: Fetch, Compile, Execute but other threads like Profiler thread tell runtime on which methods it will spend a lot of time and so that different compiler can optimize it (In V8 2 different compilers used for this reason). After optimization, compilation to machine code takes place.
@@ -33,6 +47,31 @@ Now before going in depth, one needs to first fully understand what an Object is
 > Ref to the Legendary blog:
 > http://dmitrysoshnikov.com/ecmascript/javascript-the-core<br>
 > http://dmitrysoshnikov.com/ecmascript/javascript-the-core-2nd-edition/
+
+ECMAScript does not use classes such as those in C++ or Java so instead classes we use objects which can be created in various ways like literal notation or via constructors. Objects are created by  using constructors in new expressions. New Date() creates new object while Date() returns string.
+
+Internal properties of objects can be:
+
+1. [[Prototype]]: Prototype of this object
+2. [[Class]]: String specifiying which type of object it is like "Array", "Boolean" etc.
+3. [[Extensible]]: true if own properties can be added
+4. [[Get]]: Return the value
+5. [[GetOwnProperty]]: Get property descriptor
+6. [[GetProperty]]: Return fully populated property descriptor and many more ...
+7. [[Scope]]: Lexical Environment is belongs to
+
+Now built-in ECMAScript objects can be Global Object, Function object which have [[Call]] and [[Construct]] invocation, Module Object and more.
+
+There is also term called Exotic objects. These object generally behave similar to ordinary objects except for a few specifications. Some of them this:
+
+1. Array Exotic objects which gives special tratment to array index propty keys and have length (2^32) property which is unaffected.
+2. String Exotic objects encapsulates string value and exposes virtual integer indexed data properties for each unit elements of the string value. Also have length property.
+3. Arguments Exotic objects when function arguments can be either ordinary object or this. Because of array index properties map to the formal parameters they are called exotic objects.
+4. Integer indexed Exotic objects
+5. Module namespace exotic objects
+
+Now beside this we have Proxy object internal methods and internal slots which partially define internal method to the object with custom behavious. Its like over-writing the internal methods like get method. This was introduced in ECMAScript-262-6.0
+
 
 > An Object is a collection of properties and has a single prototype object. The prototype may be either an object or the null value.
 
@@ -138,6 +177,12 @@ Also `Foo.prototype` automatically creates a special property called `constructo
 
 So now the combination of the constructor function and the prototype object may be called as a "class". Also Python first class dynamic classes have the same implementation of properties/methods resolution. So Python are just a syntactic sugar for delegation based inheritance used in ECMAScript. Now in ES6 the concept of "class" is standardized and is implemented as a syntactic sugar on top of the constructor functions as we learned.
 
+Object also have internal slots called [[Extensible]] internal slots which is boolean value can controls whether or not properties may be added to the object. If false then cannot be added else it can be added.
+
+#### ECMAScript Function Objects
+
+Function objects were used in ES5 but in later ES6.0 they were used widely and have many internal slots.
+
 ### Class
 
 Being a syntactic sugar it does work exactly like how we discussed in our previous example with prototype objects.<br>
@@ -233,6 +278,8 @@ So our AO of the `foo` function will have:
 
 
 #### 2. Scope Chain: variable objects and all parent scopes <b>later replaced by environments</b>
+
+This thing was removed from ECMAScript-262-5.1 but the concept is worth understanding and used with environments.
 
 > A scope chain is a list of objects that are searched for identifiers appear in the code of the context.
 
@@ -364,12 +411,22 @@ But now in ES6 if we simply write `let data = []` with `let k = 0` then this int
 
 ### Environments
 
-ES6 Feature which replaced context object with environment. Reasoning is explained ahead<br>
+ES5 Feature which replaced context object with environment. Reasoning is explained ahead and continued using in later version<br>
 Every execution context has an associated lexical environment.
 
 > Lexical environment: A lexical environment is a structure used to define association between identifiers appearing in the context with their values. Each environment can have a reference to an optional parent environment.
 
-In short environment is a storage of variables, functions and classes defined in a scope. But technically an environment is a pair, consisting of an environment record (actual storage which maps identifiers and values) and reference to the parent. So lets say if I have function Foo with variables then function will have 1 environment with variables in EnvironmentRecord which will be referenced by Foo environment object and it will have parent referencing to the global environment object.
+In short lexical environment is a storage of variables, functions and classes defined in a scope. But technically an environment is a pair, consisting of an environment record (actual storage which maps identifiers and values) and reference to the parent. So lets say if I have function Foo with variables then function will have 1 environment with variables in EnvironmentRecord which will be referenced by Foo environment object and it will have parent referencing to the global environment object.
+
+They usually consist of:
+1. Environment Record
+2. Outer reference
+
+And likewise lexical environment can be of different types:
+
+1. Global Environment: Lexical Environment which does not have an outer environment
+2. Module Environment: Lexical Environment that contains the bindings for the top level declarations of a Module.
+3. Function Environment: Lexical Environment that corresponds to the invocation of an ECMAScript function object.
 
 Just like prototype chain here we have identifiers resolution based on parent. Now environments records can be of different type:
 
@@ -382,8 +439,8 @@ Now generally these environment records have methods defined. Some of these Abst
 
 1. HasBinding(N)
 2. CreateMutableBinding(N,D): Here N is the text of the bound name and if D is true then the binding may be subsequently deleted
-3. CreateImmutableBinding(N, S): If S is true then exception is always raied, mostly TypeError
-4. InitializeBinding(N, V): N is our name with V as value
+3. CreateImmutableBinding(N, S): It was introduced after ES6, If S is true then exception is always raied, mostly TypeError
+4. InitializeBinding(N, V): It was introduced after ES6, N is our name with V as value
 5. SetMutableBinding(N, V, S): Set value V to the N. If S is true then for immutable objects it will throw TypeError.
 6. GetBindingValue(N, S): If S is True then exception is thrown which is ReferenceError if no binding exist
 7. DeleteBinding(N)
@@ -399,7 +456,7 @@ If S is true we throw ReferenceError exception generally happens for case:
 Else perform `envRec.CreateMutableBinding(N, true)` and then perform `envRec.InitializeBinding(N, V)` then return normal completion.<br>
 Else if binding is present and it is mutable binding then change its value to V else it is an immutable binding and throw TypeError.
 
-Now a Function Environment record is a declarative Environment Record which is used to represent the top-level scope of a function and if the function is not an ArrowFunction then it provides a `this` binding. Additional state fields of Function Environment Records are:
+Now a Function Environment record is a declarative Environment Record and it was introduced during ES6 which is used to represent the top-level scope of a function and if the function is not an ArrowFunction then it provides a `this` binding. Additional state fields of Function Environment Records are:
 
 1. [[ThisValue]]
 2. [[ThisBindingStatus]] - It can be either Lexical (If it is an ArrowFunction and have no local this value) or initialized and uninitialized
@@ -407,9 +464,11 @@ Now a Function Environment record is a declarative Environment Record which is u
 4. [[HomeObject]] - Naturally it in undefined but if super property is there and it is not an ArrowFunction then HomeObject is the object bound to as a method.
 5. [[NewTarget]] - Its an Object if it is created by Construct internal method else it is undefined.
 
+Later after ES6 more methods were introduced like BindThisValue, GetThisBinding, GetSuperBase.
+
 Now this Environment Record has similar methods as we discussed earlier except HasThisBinding and HasSuperBinding.
 
-Beside this we have Global Environment Record which is used to represent the outer most scope that is shared by all of the ECMAScript Script elemetns that are processed in a common realm. It provides the built-in globals, properites of the global object and all top level declaration. It is logically a single record but it is specified as an encapsulation of Object and Declarative environment record. It also has its base object and the value returned by it is the the global environment record GetThisBinding method. Fields with GER have besides previous methods are:
+Beside this we have Global Environment Record again introduced during ES6 and continued which is used to represent the outer most scope that is shared by all of the ECMAScript Script elemetns that are processed in a common realm. It provides the built-in globals, properites of the global object and all top level declaration. It is logically a single record but it is specified as an encapsulation of Object and Declarative environment record. It also has its base object and the value returned by it is the the global environment record GetThisBinding method. Fields with GER have besides previous methods are:
 
 1. [[ObjectRecord]]: Which is our Binding Object and it is our global bject. It contains global built-ins bindings as well as all declarations.
 2. [[GlobalThisValue]]: this value
@@ -428,7 +487,7 @@ console.log(this.x, this.y) // this.y is undefined but x is accessable
 this['not valid ID'] = 30 // Can be accessed by this
 ```
 
-So here the Global Environment will have Object Environment records and this will have binding object refering to the Global binding object consisting of variable `x` and `not valid id`. Here x is accessable by both object enviornment record and binding object. Thats because earlier we saw that execution context was represented by Variable Object/Activation object and it was originally a part of 1 simple object but later in ES6 we started using environments.
+So here the Global Environment will have Object Environment records and this will have binding object refering to the Global binding object consisting of variable `x` and `not valid id`. Here x is accessable by both object enviornment record and binding object. Thats because earlier we saw that execution context was represented by Variable Object/Activation object and it was originally a part of 1 simple object but later in ES5 (ECMAScript-262-5.1) we started using environments.
 
 Here Declarative environment record act like an activation object which we saw in ES3. In general case they are assumed to be stored directly at low level of the implementation like in registers of virtual machine for fast access). This is the main difference for implementing it. This means that specification doesn't require and recommend to implement declarative records as simple objects which is obviously inefficient. So these records are not assumed to be exposed directly to the user level which we cannot access these bindings as properties of the record. Even in ES3 we were not able to access them by activation object but Rhino implementation was exception where we could have used `__parent__` property).
 
@@ -486,9 +545,7 @@ One question might raised is that How `bar()` is able to execute outside the `wi
 (function() {
   var x = 10;
   let y = 20;
-   
   eval('var z = x + y; let m = 100;');
-  
   console.log(z); // 30
   console.log(m); // ReferenceError
 })();
@@ -576,6 +633,25 @@ Coming back to C language, over there generally a function was handles using cal
 Its true that ES6 version removed Scope Chain and Activation object from their Execution Context.
 Now there are time when few variables are not used and it is better to avoid it by avoiding it. So we can make use of Combined environment frame model and generally used by other languages like Python, Ruby etc. If they find that function is not using those variables then it doesn't save it at all. So point is that chained environment frames model optimizes the moment of function creation however at the identifier resolution the whole scope chain should be traversed until the needed binding will be found. But in case of single environment frame it optimizes the execution because all identifiers are resolved in the nearest single frame without long scope chain lookup however requires more complex algorithm of the function creation with parsing all inner function and determining with variables should be saved or not.
 
+Till now we talked about ECMAScirpt-262-5.1 specification and by that we understood that any EC must have 3 components that is lexicalEnvironment, variableEnvironment and thisValue but later in ECMAScript-262-6.0 things changed and new components got added. So our overall state looks like:
+
+1. Code Evaluation State
+2. Function
+3. Realm
+4. LexicalEnvironment
+5. VariableEnvironement
+
+Now Code evalautaion state is needed to perform, suspend and resume evaulation of the code associated with this EC. Now this concept was introduced when we started using Jobs, Job Queue and event loop and by ES5 (2009) were not introduced and things worked a little different. Now function in our EC is that function object which is evaluating the function object else it will be null if Script or Module code is executed. So its like active function object. Realm is the current Realm by using RealmRecord which is used to access ECMAScript resources. Multiple EC can have multiple Realm.
+
+Likewise we have LE and VE which is same as we discussed earlier.<br>
+Right now there other EC for different thing like Generator and they their additional components which is Generator which points to GeneratorObject that this EC is evaluating.
+
+Now we are at ECMAScript-262-7.0 (2016) we have another component which is ScriptOrModule which defines code origin either from module record or script record. Here module record and script record have information about the script evaluation for example script record will have:
+
+1. [[Realm]]: Realm within which this script was created
+2. [[Environment]]: Lexical environment
+3. [[ECMAScriptCode]]: result of parsing the source text (After ES7 this internal method is widely used in function objects and more)
+4. [[HostDefined]]: Used by Host Environments
 
 #### 3. thisValue: Context object
 
@@ -748,25 +824,58 @@ a.apply({b: 30}, [40]) // this === {b: 30}, this.b == 30, c == 40
 
 ### Realm
 
+Realm was introduced from ECMAScript-262-6.0 and continued using it.
 Before we execute anything, all ECMAScript code must be associated with a realm. It's just provide a global environment for a context.
 
 > A code realm is an object which encapsulates a separate global environment.
 
 In current version we can't explicitly create realms but they can be created implicitly by the implementation. It's just like iframe in web and sandbox of the vm module in Node.jso
 
+Generally all ECMAScript code must be associated with a Realm. Here Realm consist of Realm record whose fields are:
+
+1. [[Intrinsics]]: Intrinsic values used by code
+2. [[globalThis]]: Global object (Later in ES7 we will use GlobalObject but in ES6 it is globalThis)
+3. [[globalEnv]]: Global Lexical Environment
+4. [[templateMap]]: Record having source text order which is strings and array.
+
 ### Job
+
+Jobs and Job Queues were introduced in ECMAScript-262-6.0.
 
 > Job: A job is an abstract operation that initiates an ECMAScript computation when no other ECMAScript computation is currently in progress.
 
+Execution of a job can be placed only when there is no EC and ECS is empty. Once the Job is started then it will executes to completion. No other job can be initiated until the currently running job is completed but it can be enqueue to PendingJobs record.
+
+PendingJob is an internal record whose fields can be:
+
+1. [[Job]]: Name of Job which will be performed when initiated
+2. [[Arguments]]: List of arguments which will be passed
+3. [[Realm]]: Realm record which PendingJob is initiated
+4. [[HostDefined]]: associates additional information with a pending job by host environments
+5. After ES7 implementation we started using [[ScriptOrModule]]: Scriot or module for the inital EC when PendingJob is initiated.
+
+Job Queue is a FIFO queue of PendingJob records.
+
 Jobs are enqueued on the job queue and they are of 2 types:
 
-1. ScriptJobs: Manages script
+1. ScriptJobs: Manages script (Script and Module)
 2. PromiseJobs: Just like task queue but hadle promises and async function
 
-All these jobs are handled by the abstraction knwn as the Event loop.
+All these jobs are handled by the abstraction known as the Event loop. When ECS is found empty then from Queue the PendingJob is taken and creates an Execution Context and start execution of the associated Job abstract operation. While execution of Job there are multiple steps happening like:
+
+1. Create Realm
+2. New Execution Context
+3. Set Function to null
+4. Set Realm
+5. Set EC to ECS
+6. Get SourceText can if it is script then ScriptEvaluationJob is used means code is parsed, evaluated and check for error else it will sourceText of module and TopLevelModuleEvaluationJob is used to parse module level code.
+7. Normal Completion
+
+
 
 ### Agent
 
+This is the ES8 Implementation and continued (2018,19)
 > Agent: An agent is an abstraction encapsulating execution context stack, set of job queues, and code realms.
 
 In short Agent comprises a set of ECMAScript execution contexts, an exxecution context stack, a running execution context, a set or named job queues, Agent Record and an executing thread.
@@ -846,14 +955,9 @@ Side videos:
 [The Birth & Death of Javascript](https://www.destroyallsoftware.com/talks/the-birth-and-death-of-javascript)
 
 
+## Reference:
 
-
-
-
-
-Reference:
-
-[Links]<br>
+#### Links
 https://www.quirksmode.org/js/intro.html<br>
 https://appendto.com/2016/10/javascript-functions-as-first-class-objects/<br>
 http://dmitrysoshnikov.com/ecmascript/javascript-the-core/<br>
@@ -865,23 +969,28 @@ https://blog.sessionstack.com/how-does-javascript-actually-work-part-1-b0bacc073
 http://thibaultlaurens.github.io/javascript/2013/04/29/how-the-v8-engine-works/<br>
 https://medium.freecodecamp.org/whats-the-difference-between-javascript-and-ecmascript-cba48c73a2b5<br>
 http://dmitrysoshnikov.com/ecmascript/es5-chapter-3-2-lexical-environments-ecmascript-implementation/#variable-environment<br>
-http://www.ecma-international.org/ecma-262/<br>
+https://www.ecma-international.org/ecma-262/5.1/<br>
+https://www.ecma-international.org/ecma-262/6.0/<br>
+https://www.ecma-international.org/ecma-262/7.0/<br>
+https://www.ecma-international.org/ecma-262/8.0/<br>
+https://www.ecma-international.org/ecma-262/9.0/<br>
 https://codeburst.io/js-scope-static-dynamic-and-runtime-augmented-5abfee6223fe<br>
+https://codeburst.io/javascript-wtf-is-es6-es8-es-2017-ecmascript-dca859e4821c
 
 https://www.youtube.com/watch?v=8aGhZQkoFbQ<br>
 (Thanks to https://stackoverflow.com/questions/54503435/whats-the-order-of-execution-of-javascript-code-internally#comment95810892_54503435)
 
-[Social Links]<br>
+#### Social Links
 https://www.quora.com/What-is-the-difference-between-javascript-engine-and-javascript-runtime
 
-[PDF Links]<br>
+#### PDF Links
 http://sd.blackball.lv/library/JavaScript_Patterns_%282010%29.pdf
 
 ### TODO:
 
 1. Read about Parser for better understanding
-2. Create VO/AO diagram for example of for loop in javascript
-
+2. Create VO/AO diagram for example of for loop in
+3. Use https://nitayneeman.com/posts/a-taste-from-ecmascript-2019/
 
 ### My views:
 
