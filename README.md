@@ -2,13 +2,9 @@
 
 Javascript is primarily client side language which gets executed on webpages to make it more interactive (in short telling web browser do some dirty work). It is interpreted and not a compiled language but now days modern web browser use a technology knows as JIT (Just In-Time) compilation. Usually when you execute javascript code in browser console then behind the console it is REPL (Read-Eval-Print-Loop), this is what console runs.
 
-Javascript is Object Oriented Language with the prototype-based organization, having the concept of an object as its core abstraction. Javascript mostly implement the ECMAScript specification as described in ECMA-262 but little different too exist.
+Javascript is Object Oriented Language with the prototype-based organization, having the concept of an object as its core abstraction. Javascript mostly implement the ECMAScript specification as described in ECMA-262 but little different too exist. ECMA Internation is an organization that creates standards for technologies and ECMA-262 contains specification for a general purpose scripting language and each has its editions.
 
-Javascript code is actually get executed by Javascript Engine which is a program or an interpreter. In earlier day it acts like a standard interpreter but nowdays most of them uses JIT (Just in Time) compiler where the javascript code compiles Javascript code to bytecode. Example: V8, Rhino, SpiderMoney, JavaScriptCore, KJS, Chakra, Nashorn, JerryScript. Now engine is obviously not written in javascript but in case of V8 it is written in C++. In case of V8 the Javascript execution is different. It first compiles Javascript code into machine code by implementing JIT compiler (same as Rhino and SpiderMoney does) but it does not create byte code or intermediate code.
-
-Abstract Syntax Tree is also one of the main goal of V8 when doing parsing.
-
-ECMAScript has many specification editions named:
+ECMA-262 has many specification editions named:
 
 ES1 - 1997<br>
 ES2 - 1998<br>
@@ -20,6 +16,16 @@ ES7 - 2016<br>
 ES8 - 2017<br>
 ES9 - 2018<br>
 ES10 - 2019<br>
+
+So Javascript is a general purpose scripting languagethat conforms (comply with rules, standards) to the ECMAScript specification.
+
+Javascript code is actually get executed by Javascript Engine which is a program or an interpreter. In earlier day it acts like a standard interpreter but nowdays most of them uses JIT (Just in Time) compiler where the javascript code compiles Javascript code to bytecode. Example: V8, Rhino, SpiderMoney, JavaScriptCore, KJS, Chakra, Nashorn, JerryScript. Now engine is obviously not written in javascript but in case of V8 it is written in C++. In case of V8 the Javascript execution is different. It first compiles Javascript code into machine code by implementing JIT compiler (same as Rhino and SpiderMoney does) but it does not create byte code or intermediate code.
+
+Achieving both compiler and interpreter is done parallel, the engine flags frequently executed code parts as "Hot Path" and passes them to the compiler to optimize it by many steps. Like:
+
+1. Inline Caching: Eliminates lookup operations
+
+Abstract Syntax Tree is also one of the main goal of V8 when doing parsing.
 
 
 > Better exlanation here: http://thibaultlaurens.github.io/javascript/2013/04/29/how-the-v8-engine-works/
@@ -174,6 +180,8 @@ Also `Foo.prototype` automatically creates a special property called `constructo
 1. Some properties
 2. `__proto__` which is our `Function.prototype` object whose `__proto__` with point to `Object.prototype`. Function prototype because it will inherit some function defined built-ins.
 3. `prototype` which is our `Foo.prototype` object. Inside `Foo.prototype` we have `constructor` (Foo), some properties and `__proto__` which will be `Object.prototype`.
+
+Now the new question which might come is that: Whats the difference between  explicit prototype and implicit `__proto__`/`[[Prototype]]` ?
 
 So now the combination of the constructor function and the prototype object may be called as a "class". Also Python first class dynamic classes have the same implementation of properties/methods resolution. So Python are just a syntactic sugar for delegation based inheritance used in ECMAScript. Now in ES6 the concept of "class" is standardized and is implemented as a syntactic sugar on top of the constructor functions as we learned.
 
@@ -921,18 +929,30 @@ foo = function() {
 
 In short Functions are objects, which means they inherit from the Object prototype and they can be assigned key: value pairs or can be returned from functions. They can be assigned to variables or pass around as arguments. But why it matters ? Because you can do great things like callback functions with event listners, closures are also something which we can use.
 
-### Trust Issues ? Order of Execution
-
-
-
 ### Understanding Javascript Engine and Javascript Runtime
-Because of this nature javascript should do 2 things:<br>
+Generally javascript engine should do 2 things:<br>
 1. [Parsing](https://en.wikipedia.org/wiki/Parsing) and converting your code to runnable commands<br>
 2. Using Environment object to interact
 
 So here 2 things are in action. First is Javascript Engine and second is Javascript Runtime. For example V8 engine is used by both Chrome Browser and NodeJS but their runtime can be different as:<br>
 1. Chrome which have the window with DOM objects<br>
 2. Node with processes, buffers and more
+
+
+## Understanding Javascript
+
+Javascript is an Object Oriented language and have five primitive types which are not objects:
+
+1. number
+2. string
+3. boolean
+4. null
+5. undefined
+
+number, string and boolean are easily converted into objects either by programmer or by JS interpreter. Now objects are everything in javascript and we know that variable declaration automatically creates a property in an internal object called Activation object which later changed to Lexical Environments and we had binding objects to store them for object environment record.
+
+Objects are nothing but associative array which have key-value pairs where properties can be either value or function which we call them as methods.
+
 
 One good question can be raised is:
 
@@ -991,6 +1011,7 @@ http://sd.blackball.lv/library/JavaScript_Patterns_%282010%29.pdf
 1. Read about Parser for better understanding
 2. Create VO/AO diagram for example of for loop in
 3. Use https://nitayneeman.com/posts/a-taste-from-ecmascript-2019/
+4. Read https://medium.freecodecamp.org/javascript-essentials-why-you-should-know-how-the-engine-works-c2cc0d321553
 
 ### My views:
 
