@@ -1,8 +1,8 @@
 # Javascript: Language of the Web
 
-Javascript is primarily client side language which gets executed on webpages to make it more interactive (in short telling web browser do some dirty work). It is interpreted and not a compiled language but now days modern web browser use a technology knows as JIT (Just In-Time) compilation. Usually when you execute javascript code in browser console then behind the console it is REPL (Read-Eval-Print-Loop), this is what console runs.
+Javascript is primarily client side language which gets executed on webpages to make it more interactive (in short telling web browser do some dirty work). It was introduced in 1995 as a way to add programs to web pages in the Netscape Navigator browser. It is interpreted and not a compiled language but now days modern web browser use a technology knows as JIT (Just In-Time) compilation. Usually when you execute javascript code in browser console then behind the console it is REPL (Read-Eval-Print-Loop), this is what console runs.
 
-Javascript is Object Oriented Language with the prototype-based organization, having the concept of an object as its core abstraction. Javascript mostly implement the ECMAScript specification as described in ECMA-262 but little different too exist. ECMA Internation is an organization that creates standards for technologies and ECMA-262 contains specification for a general purpose scripting language and each has its editions.
+Javascript is Object Oriented Language with the prototype-based organization, having the concept of an object as its core abstraction. When Javascript started expanding outside of Netscape then a standard document was written to describe the way Javascript should work which is ECMAScript standard. ECMA Internation is an organization that creates standards for technologies and ECMA-262 contains specification for a general purpose scripting language and each has its editions. In practice ECMAScript and Javascript can be used interchangeably.
 
 ECMA-262 has many specification editions named:
 
@@ -17,7 +17,39 @@ ES8 - 2017<br>
 ES9 - 2018<br>
 ES10 - 2019<br>
 
-So Javascript is a general purpose scripting languagethat conforms (comply with rules, standards) to the ECMAScript specification.
+ECMAScript version 3 was the widely supported version in the time of Javascript ascent to dominance around 2000 and 2010. During this time there was working going on for version 4 which planned many changes but changing everything would break the existing code which were still running so version 4 was abandoned in 2008. So on 2009 version 5 came with small changes. Then by 2015 some major changes of version 4 were implemented finally in version 6.<br>
+So Javascript is a general purpose scripting language that conforms (comply with rules, standards) to the ECMAScript specification.
+
+<b>Fun Fact:</b> When Javascript was being introduced, the Java language was really popular in market and someone throught it was a good idea to try to ride along on this success and name it as Java-script.
+
+## Understanding Javascript
+
+Javascript is an Object Oriented language and have five primitive types which are not objects:
+
+1. number: 64 bits, 1 bit indicates the sign and some bits to store the position of decimal point so number smaller than 9 quadrillion are guranteed to always be precise.
+
+Here arthmetic operation between numbers takes precedence from left to write by `*`, `/` and `%` as same precedence higher than `+` and `-`.<br>
+Some special numbers do exist in javascript named as: `Infinity`, `-Infinity` and `NaN` (Not a Number).
+
+2. string: 16 bits, Enclosed by quotes, double quotes or backticks to mark strings (matching). Backtick quoted strings are usually called template literals and can embbed `${}` which will be converted to a string.
+
+3. boolean: true or false and can be returned with binary operators too like `3 > 2` etc. Also there is only value that is not equal to itself that is `NaN == NaN // false` because `NaN` comes where there is a computation that doesn't make any sense hence nonsensical computation is not equal to the result of other nonsensical computation.
+
+Here logical operators is used between boolean values and there are 3 logical operators: `&&`, `||` and `!`. Usually `||` has lowestt precedence then `&&` then comparison operators and rest of them comes.
+
+4. null: No Information
+5. undefined: No Information (`null == undefined // true`)
+
+### Type Conversion
+
+When operator is applied to the wrong type of value then Javascript will convert that value to the type it needs by using type coercion.
+
+number, string and boolean are easily converted into objects either by programmer or by JS interpreter. Now objects are everything in javascript and we know that variable declaration automatically creates a property in an internal object called Activation object which later changed to Lexical Environments and we had binding objects to store them for object environment record.
+
+Objects are nothing but associative array which have key-value pairs where properties can be either value or function which we call them as methods.<br>
+#### Short circuiting of logical operators
+
+`||` handle values differently, they convert the value in left side in boolean type in order to decide what to do and based on result they will return either the original left hand value or the right hand value. Left only if left side turns out true else right. `null || "Foo" // Foo` and `"Foo" || "Bar" // Foo`. `&&` works the same but if left side is false then left side is returned else right side. So in short circuit evaluation no matter what is there on right side if left side is true (in case of `||` condition) then right side will never be evaluated.
 
 Javascript code is actually get executed by Javascript Engine which is a program or an interpreter. In earlier day it acts like a standard interpreter but nowdays most of them uses JIT (Just in Time) compiler where the javascript code compiles Javascript code to bytecode. Example: V8, Rhino, SpiderMoney, JavaScriptCore, KJS, Chakra, Nashorn, JerryScript. Now engine is obviously not written in javascript but in case of V8 it is written in C++. In case of V8 the Javascript execution is different. It first compiles Javascript code into machine code by implementing JIT compiler (same as Rhino and SpiderMoney does) but it does not create byte code or intermediate code.
 
@@ -939,21 +971,6 @@ So here 2 things are in action. First is Javascript Engine and second is Javascr
 2. Node with processes, buffers and more
 
 
-## Understanding Javascript
-
-Javascript is an Object Oriented language and have five primitive types which are not objects:
-
-1. number
-2. string
-3. boolean
-4. null
-5. undefined
-
-number, string and boolean are easily converted into objects either by programmer or by JS interpreter. Now objects are everything in javascript and we know that variable declaration automatically creates a property in an internal object called Activation object which later changed to Lexical Environments and we had binding objects to store them for object environment record.
-
-Objects are nothing but associative array which have key-value pairs where properties can be either value or function which we call them as methods.
-
-
 One good question can be raised is:
 
 [How does hoisting work if JavaScript is an interpreted language?](https://stackoverflow.com/questions/45620041/how-does-hoisting-work-if-javascript-is-an-interpreted-language)<br>
@@ -996,6 +1013,7 @@ https://www.ecma-international.org/ecma-262/8.0/<br>
 https://www.ecma-international.org/ecma-262/9.0/<br>
 https://codeburst.io/js-scope-static-dynamic-and-runtime-augmented-5abfee6223fe<br>
 https://codeburst.io/javascript-wtf-is-es6-es8-es-2017-ecmascript-dca859e4821c
+http://eloquentjavascript.net
 
 https://www.youtube.com/watch?v=8aGhZQkoFbQ<br>
 (Thanks to https://stackoverflow.com/questions/54503435/whats-the-order-of-execution-of-javascript-code-internally#comment95810892_54503435)
