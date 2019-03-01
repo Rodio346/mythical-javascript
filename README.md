@@ -2,7 +2,7 @@
 
 Javascript is primarily client side language which gets executed on webpages to make it more interactive (in short telling web browser do some dirty work). It was introduced in 1995 as a way to add programs to web pages in the Netscape Navigator browser. It is interpreted and not a compiled language but now days modern web browser use a technology knows as JIT (Just In-Time) compilation. Usually when you execute javascript code in browser console then behind the console it is REPL (Read-Eval-Print-Loop), this is what console runs.
 
-Javascript is Object Oriented Language with the prototype-based organization, having the concept of an object as its core abstraction. When Javascript started expanding outside of Netscape then a standard document was written to describe the way Javascript should work which is ECMAScript standard. ECMA Internation is an organization that creates standards for technologies and ECMA-262 contains specification for a general purpose scripting language and each has its editions. In practice ECMAScript and Javascript can be used interchangeably.
+Javascript is Object Oriented Language with the prototype-based organization, having the concept of an object as its core abstraction. When Javascript started expanding outside of Netscape then a standard document was written to describe the way Javascript should work which is ECMAScript standard. ECMA International is an organization that creates standards for technologies and ECMA-262 contains specification for a general purpose scripting language and each has its editions. In practice ECMAScript and Javascript can be used interchangeably.
 
 ECMA-262 has many specification editions named:
 
@@ -40,6 +40,29 @@ Here logical operators is used between boolean values and there are 3 logical op
 4. null: No Information
 5. undefined: No Information (`null == undefined // true`)
 
+Next is our data sets, there are times when we need to deal with huge number of data sets like chunks of integers and to represent them we start using array. Besides this we have properties too which is available for each and every value except `null` and `undefined` which has no value hence no properties.
+
+Now the properties can be accessed in 2 ways:
+
+1. Using dot notation which means it will fetches the property of value named.
+2. Using square bracket notation which means the value named between brackets is evaluated to get the property name, means result is converted to a string as the property name.
+
+Now generally there are 2 types of data types present in Javascript:
+
+1. Primitive Data types: This includes null, undefined, string, boolean, number and symbol (Data that is not an object and has no methods)
+2. Derived Data types: This includes function, array, re which are derived from object.
+
+<b>Note:</b> In string we usually see that we can execute `"a".length` even if string is primitive and thats because language means javascript "boxes" the primitives in their object wrappers when appropriate. And it can be best seen with numbers where you won't be able to execute `27.toString()` which is a bit ccomplicated because of vagaries of the token grammar but it is possible if `a=27` and `a.toString()` or like `(27).toString()`.
+
+In short except of `null` and `undefined` all primitive values have object equivalents that wrap around the primitive values. 
+
+1. `String` for the string primitive
+2. `Number` for the number primitive
+3. `Boolean` for the boolean primitive
+4. `Symbol` for the symbol primitive
+
+Here array can be considered to be an object where numbers as property names and having values with them. Now whenever array is modified then its his work to modify all the corresponding details like length, last index etc.
+
 ### Type Conversion
 
 When operator is applied to the wrong type of value then Javascript will convert that value to the type it needs by using type coercion.
@@ -47,9 +70,40 @@ When operator is applied to the wrong type of value then Javascript will convert
 number, string and boolean are easily converted into objects either by programmer or by JS interpreter. Now objects are everything in javascript and we know that variable declaration automatically creates a property in an internal object called Activation object which later changed to Lexical Environments and we had binding objects to store them for object environment record.
 
 Objects are nothing but associative array which have key-value pairs where properties can be either value or function which we call them as methods.<br>
-#### Short circuiting of logical operators
+### Short circuiting of logical operators
 
 `||` handle values differently, they convert the value in left side in boolean type in order to decide what to do and based on result they will return either the original left hand value or the right hand value. Left only if left side turns out true else right. `null || "Foo" // Foo` and `"Foo" || "Bar" // Foo`. `&&` works the same but if left side is false then left side is returned else right side. So in short circuit evaluation no matter what is there on right side if left side is true (in case of `||` condition) then right side will never be evaluated.
+
+### Expression and statements
+
+Any code that produces value is called an expression (any int/char) but statement is a complete line of code that performs some action. Now these internal state are remembered by using bindings which binds the value. Here in Javascript binding is like as tentacles rather than boxes. It means that they do not store but grasp them. If there is nothing to grasp then undefined is assigned.
+
+Generally binding is possible by using `var`, `let` and `const`. Now the collection of bindings and their values that exist at a given tiime is called the environment. By starting these environment are not empty but by default have bindings that are part of the language standard and at the same time also have bindings that provide ways to interact with the surroundings system for example in a browser like onclick or keyboard input.
+
+#### Next we talk about control flow, conditional execution, while and do loops, for loops, switch, comments which are quite common
+
+### Function
+
+Functions are building block of Javascript which is used by keyword function having parameters and body defined. Each of these bindings can either return value or have side effect to the program by giving undefined value. Now each bindings has a scope and has its own short world defined. Usually in pre-2015 Javascript there was only one option for binding which was `var` which creates binding for global scope but now it is possible to have binding with `let` and `const` for particular block.
+
+Function act as values, it can be passed as argument, can be reassigned and more. Now function can be created in 3 different ways:
+
+1. Function Expression: When function is binded with the binding value
+2. Function Declaration: When funtion is used at the start of the statement
+3. Arrow Function: When arrow sign is used
+
+Function declaration doesn't need to follow the top-bottom control flow as all the function declaration are moved at top by default. Example of Arrow function can be seen as:
+
+```
+const foo = (x) => {return x * x};
+const bar = x => x * x;
+```
+
+To keep track of function calls, it make use of the call stack to see which function is called by whom.
+
+<b>Optional Arguments:</b> It is possible to pass multiple arguments which is more than expected and it gets ignored by Javascript, likewise we can send less arguments by having other arguments value as undefined by default. Rather than making extra argument as undefined we can even pre-define the value by using `=` in function declaration.
+
+### Javascript Engine
 
 Javascript code is actually get executed by Javascript Engine which is a program or an interpreter. In earlier day it acts like a standard interpreter but nowdays most of them uses JIT (Just in Time) compiler where the javascript code compiles Javascript code to bytecode. Example: V8, Rhino, SpiderMoney, JavaScriptCore, KJS, Chakra, Nashorn, JerryScript. Now engine is obviously not written in javascript but in case of V8 it is written in C++. In case of V8 the Javascript execution is different. It first compiles Javascript code into machine code by implementing JIT compiler (same as Rhino and SpiderMoney does) but it does not create byte code or intermediate code.
 
@@ -364,7 +418,45 @@ Also when any context ends then all the state and itself gets destroyed. But we 
 
 > A closure is a pair consisting of the function code and the environment in which the function is created.
 
+In short the ability to treat functions as values combined with the fact that local bindings are re-created every time a function is called.
+
 Concept related with scope chain
+
+Real life usage can be seen as:
+
+```
+function multiplier(factor) {
+  return number => number * factor;
+}
+
+let twice = multiplier(2);
+console.log(twice(5));
+```
+
+So here the function body sees the environment in which it was created, not the environment in which it is called. Means it remembers this environment. Now something which we will discuss off the topic which is recursion, usually we avoid having recursion in our Javascript code because the time taken by recursion is far greater than iteration method but later in ES6 we have something called Tail Call Optimization which helps to optimize our recursive code. For example:
+
+If our code has nothing to do with the stack then it will optimize it by dropping the frame and adding the new one
+
+Example:
+```
+(function(){
+    function fib(n, sum=0, prev=1) {
+      if (n <= 1) return sum;
+      return fib(n-1, prev+sum, sum);  // Javascript engine will optimize for tail recursion and it will dump that frame before pushing the new one
+    }
+    console.log(fib(20000));
+})();
+```
+
+But the wrong usage can be:
+```
+function fib(n) {
+    if (n <= 0) return 0;
+    if (n === 1 || n === 2) return 1;
+    return fib(n-1) + fib(n-2); // Here stack frame needs to be maintained as we needs to add 2 values together
+}
+console.log(fib(20000)); // maximum call stack size exceeded
+```
 
 First problem is "Upward funarg problem"<br>
 When a function is returned and if it is using free variable then it should be able to access it even after when parent context is ended.<br>
@@ -1013,7 +1105,11 @@ https://www.ecma-international.org/ecma-262/8.0/<br>
 https://www.ecma-international.org/ecma-262/9.0/<br>
 https://codeburst.io/js-scope-static-dynamic-and-runtime-augmented-5abfee6223fe<br>
 https://codeburst.io/javascript-wtf-is-es6-es8-es-2017-ecmascript-dca859e4821c
+https://hackernoon.com/es6-tail-call-optimization-43f545d2f68b
 http://eloquentjavascript.net
+https://stackoverflow.com/questions/12996871/why-does-typeof-array-with-objects-return-object-and-not-array
+https://stackoverflow.com/questions/5751704/javascript-do-primitive-strings-have-methods
+https://developer.mozilla.org/en-US/docs/Glossary/Primitive
 
 https://www.youtube.com/watch?v=8aGhZQkoFbQ<br>
 (Thanks to https://stackoverflow.com/questions/54503435/whats-the-order-of-execution-of-javascript-code-internally#comment95810892_54503435)
