@@ -4,6 +4,10 @@ Javascript is primarily client side language which gets executed on webpages to 
 
 Javascript is Object Oriented Language with the prototype-based organization, having the concept of an object as its core abstraction. When Javascript started expanding outside of Netscape then a standard document was written to describe the way Javascript should work which is ECMAScript standard. ECMA International is an organization that creates standards for technologies and ECMA-262 contains specification for a general purpose scripting language and each has its editions. In practice ECMAScript and Javascript can be used interchangeably.
 
+Note: The ECMAScript specification does not describe the Document Object Model (DOM) which is standardized by the W3C (World Wide Web Consortium) and WHATWG (Web Hypertext Application Technology Working Group).
+
+Now we know that ECMAScript is specification but where does it used in real life ? In general ECMAScript specifications is a set of requirements for implementing ECMAScript, it is useful if you want to implement standards-compliant language features in your ECMAScript implementation or engine like SpiderMoney, V8 etc. Here Javascript supports all functionality outlines in the ECMAScript specification.
+
 ECMA-262 has many specification editions named:
 
 ES1 - 1997<br>
@@ -11,6 +15,9 @@ ES2 - 1998<br>
 ES3 - 1999<br>
 ES4 - Abandoned<br>
 ES5 - 2009<br>
+
+By 2012 - All modern browser supported ECMAScript 5.1
+
 ES6 - 2015<br>
 ES7 - 2016<br>
 ES8 - 2017<br>
@@ -62,6 +69,22 @@ In short except of `null` and `undefined` all primitive values have object equiv
 4. `Symbol` for the symbol primitive
 
 Here array can be considered to be an object where numbers as property names and having values with them. Now whenever array is modified then its his work to modify all the corresponding details like length, last index etc.
+
+In case of Array, it's quite common to loop over them and the traditional way of doing it might look like:
+```
+for (let i=0; i<5;i++) {
+    // Do something
+}
+```
+
+But in modern javascript we do it like:
+```
+for (let i of <Any iterable>) {
+    // Do something
+}
+```
+
+Now some important methods are: push(x), pop, shift, unshift(x), indexOf(x), lastIndexOf(x), slice(x, y)
 
 ### Type Conversion
 
@@ -140,9 +163,19 @@ Now before going in depth, one needs to first fully understand what an Object is
 > http://dmitrysoshnikov.com/ecmascript/javascript-the-core<br>
 > http://dmitrysoshnikov.com/ecmascript/javascript-the-core-2nd-edition/
 
-ECMAScript does not use classes such as those in C++ or Java so instead classes we use objects which can be created in various ways like literal notation or via constructors. Objects are created by  using constructors in new expressions. New Date() creates new object while Date() returns string.
+ECMAScript does not use classes such as those in C++ or Java so instead classes we use objects which can be created in various ways like literal notation or via constructors. Objects are created by  using constructors in new expressions. New Date() creates new object while Date() returns string. So Objects are nothing but list of properties seperated by commas. Each property has a name followed by value.
 
-Internal properties of objects can be:
+<b>Fun Fact:</b>
+```
+let data = [];
+
+function foo(dog, cat) {
+  data.push({dog, cat});  // It is similar as dog: dog, cat: cat
+}
+```
+
+
+Now according to ECMA-262 specifications, internal properties of objects can be:
 
 1. [[Prototype]]: Prototype of this object
 2. [[Class]]: String specifiying which type of object it is like "Array", "Boolean" etc.
@@ -1110,6 +1143,7 @@ http://eloquentjavascript.net
 https://stackoverflow.com/questions/12996871/why-does-typeof-array-with-objects-return-object-and-not-array
 https://stackoverflow.com/questions/5751704/javascript-do-primitive-strings-have-methods
 https://developer.mozilla.org/en-US/docs/Glossary/Primitive
+https://developer.mozilla.org/en-US/docs/Web/JavaScript
 
 https://www.youtube.com/watch?v=8aGhZQkoFbQ<br>
 (Thanks to https://stackoverflow.com/questions/54503435/whats-the-order-of-execution-of-javascript-code-internally#comment95810892_54503435)
