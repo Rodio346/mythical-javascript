@@ -31,6 +31,17 @@ So Javascript is a general purpose scripting language that conforms (comply with
 
 ## Understanding Javascript
 
+We just understood exactly what is Javascript but at the end when you see different explanation of it and then we see some new terms which is so hard to understand but in short the key words are important thing in definition for example:
+
+1. Lightweight Interpreted
+2. JIT compiled programming language
+3. First Class function
+4. Scripting Language
+5. ProtoType based
+6. Multi-paradigm, 
+7. Dynamic language
+8. Programming Paradigm: Object Oriented Language + Imperative + Declarative
+
 Javascript is an Object Oriented language and have five primitive types which are not objects:
 
 1. number: 64 bits, 1 bit indicates the sign and some bits to store the position of decimal point so number smaller than 9 quadrillion are guranteed to always be precise.
