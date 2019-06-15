@@ -33,8 +33,43 @@ So Javascript is a general purpose scripting language that conforms (comply with
 
 We just understood exactly what is Javascript but at the end when you see different explanation of it and then we see some new terms which is so hard to understand but in short the key words are important thing in definition for example:
 
-1. Lightweight Interpreted
-2. JIT compiled programming language
+#### Lightweight Interpreted
+Fairly simple to use and have not many constructs but yes after ECMAScript 5 it is getting much more complex heavier with all the dependencies [Link](https://coderanch.com/t/631906/languages/javascript-lightweight-programming-language)
+#### JIT compiled programming language
+Javascript started out slow in earlier days but it was fixed by using JIT compilers<br>
+One of the major problems of interpreter were that in loop, the same code was executed over and over again which is time consuming but again the feature of interpreter is best fit for Javascript.
+
+Now In case of compiler we need a bit more time in computing and generating the compiler code which is its overhead but compiling any code is useful as we need not to compute over and over again and the optimization feature makes it more fast.
+
+To overcome our problem in Javascript we used JIT compiler. So our Javascript engine is reponsible for running the code and understanding it and these different browser made changes in it by adding monitors aka profiler. These monitor watches the code and note down how many times they have been executed and what types were used. So at start every code is first go through interpreter and gets executed but when the same line of code runs multiple times then that segment of code is termed as warm and then it will hot.
+
+So if monitor finds any warm code segment then it is sent through Baseline Compiler to be compiler then it will store that compilation. While compilation each line of the function is called stub and stub are indexed by line number with their type. If monitor sees that same code segment is getting executed over and over again then the compiler version of code is pulled out.
+
+Now if the monitor observe that the code segment is hot then it takes extra time to make it optimized so it will be sent to Optimization Compiler. Here the OC uses the information of which monitor has gathered and based on that it makes judgement. For example you can have 99 same objects passing where OC made changes based on that but if last object different from the previous one then the compiled optimized code is no more useful, means if JIT assumptions are wrong then the optimized code is sent to trash means de-optimization. There can be a case where optimization and de-optimization takes place over and over again thats why most browser have optimization/deoptimization cycles, like if there are 10 attempts then it will stop trying.
+
+Example: Type Optimization
+
+```
+function arraySum(arr) {
+  var sum = 0;
+  for (var i = 0; i < arr.length; i++) {
+    sum += arr[i];
+  }
+}
+```
+
+Here `+=` takes more than one step to execute because of dynamic typing. There can be case when there are arr of 100 integers, then the code segment will warms up, now the baseline compiler will create stub for each operation in function, means there will be a stub for `sum += arr[i]` for integer addition. But there can be a case when there are no integers, in that case it will generate different machine code.
+
+So possible scenarios are:
+1. sum is int ?
+2. arr is an array ?
+3. i is int ?
+4. arr[i] is int ?
+
+So JIT have to check each type everytime operation is executed so to overcome this, optimization compiler comes into place. So by OC whole function is compiled together and types are checked before hand. There can be more optimization for special cases too like if whole array is integer then do something else. So Javascript make use of monitoring feature heavily to optimize their code execution.
+
+Some overhead are: Optimization/Deoptimization, memory used for the monitors bookkeeping and memory used to store baseline and optimized version of a function
+
 3. First Class function
 4. Scripting Language
 5. ProtoType based
@@ -1155,6 +1190,8 @@ https://stackoverflow.com/questions/12996871/why-does-typeof-array-with-objects-
 https://stackoverflow.com/questions/5751704/javascript-do-primitive-strings-have-methods
 https://developer.mozilla.org/en-US/docs/Glossary/Primitive
 https://developer.mozilla.org/en-US/docs/Web/JavaScript
+https://coderanch.com/t/631906/languages/javascript-lightweight-programming-language
+https://hacks.mozilla.org/2017/02/a-crash-course-in-just-in-time-jit-compilers/
 
 https://www.youtube.com/watch?v=8aGhZQkoFbQ<br>
 (Thanks to https://stackoverflow.com/questions/54503435/whats-the-order-of-execution-of-javascript-code-internally#comment95810892_54503435)
