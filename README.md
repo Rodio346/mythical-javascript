@@ -100,21 +100,26 @@ Even though the JS is compiled but the behavious is still dynamic as we saw in J
 
 Now whenever somebody ask you tell me what you know about Javascript then these 7 points are enough I guess.
 
-Javascript in general have five primitive types which are not objects:
+Now generally there are 2 types of data types present in Javascript:
+
+1. Primitive Data types: This includes null, undefined, string, boolean, number and symbol (Data that is not an object and has no methods)
+2. Derived Data types: This includes function, array, re which are derived from object.
+
+In Primitive Data types have 6 data types:
 
 1. number: 64 bits, 1 bit indicates the sign and some bits to store the position of decimal point so number smaller than 9 quadrillion are guranteed to always be precise.
-
-Here arthmetic operation between numbers takes precedence from left to write by `*`, `/` and `%` as same precedence higher than `+` and `-`.<br>
+Here arthmetic operation between numbers takes precedence from left to right by `*`, `/` and `%` as same precedence higher than `+` and `-`.<br>
 Some special numbers do exist in javascript named as: `Infinity`, `-Infinity` and `NaN` (Not a Number).
 
 2. string: 16 bits, Enclosed by quotes, double quotes or backticks to mark strings (matching). Backtick quoted strings are usually called template literals and can embbed `${}` which will be converted to a string.
 
-3. boolean: true or false and can be returned with binary operators too like `3 > 2` etc. Also there is only value that is not equal to itself that is `NaN == NaN // false` because `NaN` comes where there is a computation that doesn't make any sense hence nonsensical computation is not equal to the result of other nonsensical computation.
-
-Here logical operators is used between boolean values and there are 3 logical operators: `&&`, `||` and `!`. Usually `||` has lowestt precedence then `&&` then comparison operators and rest of them comes.
+3. boolean: true or false and can be returned with binary operators too like `3 > 2` etc. Also in JS there is only one value that is not equal to itself which is `NaN == NaN // false` because `NaN` comes where there is a computation that doesn't make any sense hence nonsensical computation is not equal to the result of other nonsensical computation. Here logical operators is used between boolean values and there are 3 logical operators: `&&`, `||` and `!`. Usually `||` has lowest precedence then `&&` then comparison operators and rest of them comes.
 
 4. null: No Information
 5. undefined: No Information (`null == undefined // true`)
+6. symbol: This was instroduced in ES6. The original motivation for introducing symbols to Javascript was to enable private properties but later it is no longer private as we can get property. Now they are defined as unique symbols and main intention is to avoid name clashes between properties.
+
+In implementation, using symbol instead of string allows different modules to create properties that don't conflict with one another. The only way we can create symbol is by using Symbol constructor.
 
 Next is our data sets, there are times when we need to deal with huge number of data sets like chunks of integers and to represent them we start using array. Besides this we have properties too which is available for each and every value except `null` and `undefined` which has no value hence no properties.
 
@@ -122,11 +127,6 @@ Now the properties can be accessed in 2 ways:
 
 1. Using dot notation which means it will fetches the property of value named.
 2. Using square bracket notation which means the value named between brackets is evaluated to get the property name, means result is converted to a string as the property name.
-
-Now generally there are 2 types of data types present in Javascript:
-
-1. Primitive Data types: This includes null, undefined, string, boolean, number and symbol (Data that is not an object and has no methods)
-2. Derived Data types: This includes function, array, re which are derived from object.
 
 <b>Note:</b> In string we usually see that we can execute `"a".length` even if string is primitive and thats because language means javascript "boxes" the primitives in their object wrappers when appropriate. And it can be best seen with numbers where you won't be able to execute `27.toString()` which is a bit ccomplicated because of vagaries of the token grammar but it is possible if `a=27` and `a.toString()` or like `(27).toString()`.
 
@@ -1206,24 +1206,26 @@ https://www.ecma-international.org/ecma-262/7.0/<br>
 https://www.ecma-international.org/ecma-262/8.0/<br>
 https://www.ecma-international.org/ecma-262/9.0/<br>
 https://codeburst.io/js-scope-static-dynamic-and-runtime-augmented-5abfee6223fe<br>
-https://codeburst.io/javascript-wtf-is-es6-es8-es-2017-ecmascript-dca859e4821c
-https://hackernoon.com/es6-tail-call-optimization-43f545d2f68b
-http://eloquentjavascript.net
-https://stackoverflow.com/questions/12996871/why-does-typeof-array-with-objects-return-object-and-not-array
-https://stackoverflow.com/questions/5751704/javascript-do-primitive-strings-have-methods
-https://developer.mozilla.org/en-US/docs/Glossary/Primitive
-https://developer.mozilla.org/en-US/docs/Web/JavaScript
-https://coderanch.com/t/631906/languages/javascript-lightweight-programming-language
-https://hacks.mozilla.org/2017/02/a-crash-course-in-just-in-time-jit-compilers/
-https://en.wikipedia.org/wiki/First-class_citizen
-https://appendto.com/2016/10/javascript-functions-as-first-class-objects/
-https://en.wikipedia.org/wiki/First-class_function
-https://en.wikipedia.org/wiki/Scripting_language
-https://en.wikipedia.org/wiki/Prototype-based_programming
-https://en.wikipedia.org/wiki/JavaScript
-https://stackoverflow.com/questions/32476680/what-does-it-mean-that-javascript-is-dynamic
-https://www.quora.com/Is-JavaScript-a-dynamically-typed-or-statically-typed-language
-https://codeburst.io/imperative-vs-declarative-javascript-8b5e45a602dd
+https://codeburst.io/javascript-wtf-is-es6-es8-es-2017-ecmascript-dca859e4821c<br>
+https://hackernoon.com/es6-tail-call-optimization-43f545d2f68b<br>
+http://eloquentjavascript.net<br>
+https://stackoverflow.com/questions/12996871/why-does-typeof-array-with-objects-return-object-and-not-array<br>
+https://stackoverflow.com/questions/5751704/javascript-do-primitive-strings-have-methods<br>
+https://developer.mozilla.org/en-US/docs/Glossary/Primitive<br>
+https://developer.mozilla.org/en-US/docs/Web/JavaScript<br>
+https://coderanch.com/t/631906/languages/javascript-lightweight-programming-language<br>
+https://hacks.mozilla.org/2017/02/a-crash-course-in-just-in-time-jit-compilers/<br>
+https://en.wikipedia.org/wiki/First-class_citizen<br>
+https://appendto.com/2016/10/javascript-functions-as-first-class-objects/<br>
+https://en.wikipedia.org/wiki/First-class_function<br>
+https://en.wikipedia.org/wiki/Scripting_language<br>
+https://en.wikipedia.org/wiki/Prototype-based_programming<br>
+https://en.wikipedia.org/wiki/JavaScript<br>
+https://stackoverflow.com/questions/32476680/what-does-it-mean-that-javascript-is-dynamic<br>
+https://www.quora.com/Is-JavaScript-a-dynamically-typed-or-statically-typed-language<br>
+https://codeburst.io/imperative-vs-declarative-javascript-8b5e45a602dd<br>
+https://stackoverflow.com/questions/36797206/what-is-the-symbol-primitive-data-type-in-javascript<br>
+https://stackoverflow.com/questions/21724326/what-is-the-motivation-for-bringing-symbols-to-es6<br>
 
 https://www.youtube.com/watch?v=8aGhZQkoFbQ<br>
 (Thanks to https://stackoverflow.com/questions/54503435/whats-the-order-of-execution-of-javascript-code-internally#comment95810892_54503435)
