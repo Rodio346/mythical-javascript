@@ -33,9 +33,9 @@ So Javascript is a general purpose scripting language that conforms (comply with
 
 We just understood exactly what is Javascript but at the end when you see different explanation of it and then we see some new terms which is so hard to understand but in short the key words are important thing in definition for example:
 
-#### Lightweight Interpreted
+#### 1. Lightweight Interpreted
 Fairly simple to use and have not many constructs but yes after ECMAScript 5 it is getting much more complex heavier with all the dependencies [Link](https://coderanch.com/t/631906/languages/javascript-lightweight-programming-language)
-#### JIT compiled programming language
+#### 2. JIT compiled programming language
 Javascript started out slow in earlier days but it was fixed by using JIT compilers<br>
 One of the major problems of interpreter were that in loop, the same code was executed over and over again which is time consuming but again the feature of interpreter is best fit for Javascript.
 
@@ -70,14 +70,37 @@ So JIT have to check each type everytime operation is executed so to overcome th
 
 Some overhead are: Optimization/Deoptimization, memory used for the monitors bookkeeping and memory used to store baseline and optimized version of a function
 
-3. First Class function
-4. Scripting Language
-5. ProtoType based
-6. Multi-paradigm, 
-7. Dynamic language
-8. Programming Paradigm: Object Oriented Language + Imperative + Declarative
+#### 3. First Class function
+In programming language design there is something called First Class citizen (also type, object, entity or value) which is an entity which supports all the operation available to other entities, it can include like passed as an argument, returned from a function, modified or even assigned to any variable.
 
-Javascript is an Object Oriented language and have five primitive types which are not objects:
+The simplest scalar data types such as integer and floating point numbers are neaerly always first-class. For better understanding think about arrays in C language, they cannot be assigned as objects or passed as parameters to a subroutine because only the position of their first element is actually passed (array pointers).
+
+So in short First Class citizenship simply means being able to do what everyone else can do. In javascript functions are objects means then can be assgined as key value pair. returned from function or assigned to any function hence the designation of first class function, in better words first class function treats functions as first-class citizens.
+
+Later in this, we will talk about implementation difficulties in passing function as arguments which is funarg problems.
+
+
+#### 4. Scripting Language
+In general scripting language is a programming language that allows some control of a single or many software application and in case of javascript we can think of application is the browser. In simpler terms, scripting language is one that instructs a host to carry out a series of actions like an actor reading from a script. 
+
+Scripting languages are usually interpreted but we saw how things changed like using JIT for optimization and fast execution. Nowdays Javascript has matured with major changes like classes, iterators, modules and more which is no longer restricted to browser, they get compiled to bytecode like Java or directly to machine code like C++ which makes them acts like traditional compiled languages.
+
+Then why Javascript is Scripting language ? Maybe because of it's past or having many characteristics of Scripting language like use of Interpreter, Easy to Learn or for domain specific environments like Javascript for Web browser
+
+#### 5. ProtoType based
+Prototype based programming is a style of object-oriented programming in which inheritance is performed via a process of reusing existing objects via delegation that serve as prototypes.
+
+Now this is tough to understand, but in simpler terms prototype is just an object which is used for inheritance. Later we will understand what exactly is prototype
+
+#### 6. Multi-paradigm
+Multi-paradigm means Javascript more than one programming design, event-driver (when flow of the program is determined by user actions like click or sensors and more), functional, imperative (explicitly tell how you want to do something, including Object Oriented and prototype based) and declarative (what you want to do)
+#### 7. Dynamic language
+In javascript all variables and even code in dynamic, we can create new variables at runtime, the types are determined at runtime. For example at starting variable `x` can be integer and later it can string or even array with assignment.
+Even though the JS is compiled but the behavious is still dynamic as we saw in JIT example how compiled and optimized code was generated for that specific type.
+
+Now whenever somebody ask you tell me what you know about Javascript then these 7 points are enough I guess.
+
+Javascript in general have five primitive types which are not objects:
 
 1. number: 64 bits, 1 bit indicates the sign and some bits to store the position of decimal point so number smaller than 9 quadrillion are guranteed to always be precise.
 
@@ -1192,6 +1215,15 @@ https://developer.mozilla.org/en-US/docs/Glossary/Primitive
 https://developer.mozilla.org/en-US/docs/Web/JavaScript
 https://coderanch.com/t/631906/languages/javascript-lightweight-programming-language
 https://hacks.mozilla.org/2017/02/a-crash-course-in-just-in-time-jit-compilers/
+https://en.wikipedia.org/wiki/First-class_citizen
+https://appendto.com/2016/10/javascript-functions-as-first-class-objects/
+https://en.wikipedia.org/wiki/First-class_function
+https://en.wikipedia.org/wiki/Scripting_language
+https://en.wikipedia.org/wiki/Prototype-based_programming
+https://en.wikipedia.org/wiki/JavaScript
+https://stackoverflow.com/questions/32476680/what-does-it-mean-that-javascript-is-dynamic
+https://www.quora.com/Is-JavaScript-a-dynamically-typed-or-statically-typed-language
+https://codeburst.io/imperative-vs-declarative-javascript-8b5e45a602dd
 
 https://www.youtube.com/watch?v=8aGhZQkoFbQ<br>
 (Thanks to https://stackoverflow.com/questions/54503435/whats-the-order-of-execution-of-javascript-code-internally#comment95810892_54503435)
@@ -1208,6 +1240,7 @@ http://sd.blackball.lv/library/JavaScript_Patterns_%282010%29.pdf
 2. Create VO/AO diagram for example of for loop in
 3. Use https://nitayneeman.com/posts/a-taste-from-ecmascript-2019/
 4. Read https://medium.freecodecamp.org/javascript-essentials-why-you-should-know-how-the-engine-works-c2cc0d321553
+5. First class function funarg problems
 
 ### My views:
 
