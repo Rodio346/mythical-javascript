@@ -117,9 +117,14 @@ Some special numbers do exist in javascript named as: `Infinity`, `-Infinity` an
 
 4. null: No Information
 5. undefined: No Information (`null == undefined // true`)
-6. symbol: This was instroduced in ES6. The original motivation for introducing symbols to Javascript was to enable private properties but later it is no longer private as we can get property. Now they are defined as unique symbols and main intention is to avoid name clashes between properties.
+6. symbol: This was instroduced in ES6. The original motivation for introducing symbols to Javascript was to enable private properties but later it was no longer private as we can get property from it. Now they are defined as unique symbols and the main intention is to avoid name clashes between properties.
 
 In implementation, using symbol instead of string allows different modules to create properties that don't conflict with one another. The only way we can create symbol is by using Symbol constructor.
+
+In simpler terms, Symbols give a whole new sense of purpose to Objects - they provide a kind of hidden under layer to Objects - not iterable over, not fetched using the already existing Reflection tools and guaranteed not to conflict with other properties in the object
+
+So if you don't have reference to symbols, then you really can't do anything except if we use `Symbol.for()`, this method creates global Symbol registry and one major point is that this registry is also cross-realm meaning a Symbol from an iframe or service worker will be the same as one generated from your existing frame
+
 
 Next is our data sets, there are times when we need to deal with huge number of data sets like chunks of integers and to represent them we start using array. Besides this we have properties too which is available for each and every value except `null` and `undefined` which has no value hence no properties.
 
@@ -1226,6 +1231,7 @@ https://www.quora.com/Is-JavaScript-a-dynamically-typed-or-statically-typed-lang
 https://codeburst.io/imperative-vs-declarative-javascript-8b5e45a602dd<br>
 https://stackoverflow.com/questions/36797206/what-is-the-symbol-primitive-data-type-in-javascript<br>
 https://stackoverflow.com/questions/21724326/what-is-the-motivation-for-bringing-symbols-to-es6<br>
+https://www.keithcirkel.co.uk/metaprogramming-in-es6-symbols/<br>
 
 https://www.youtube.com/watch?v=8aGhZQkoFbQ<br>
 (Thanks to https://stackoverflow.com/questions/54503435/whats-the-order-of-execution-of-javascript-code-internally#comment95810892_54503435)
@@ -1243,6 +1249,7 @@ http://sd.blackball.lv/library/JavaScript_Patterns_%282010%29.pdf
 3. Use https://nitayneeman.com/posts/a-taste-from-ecmascript-2019/
 4. Read https://medium.freecodecamp.org/javascript-essentials-why-you-should-know-how-the-engine-works-c2cc0d321553
 5. First class function funarg problems
+6. Read https://www.keithcirkel.co.uk/metaprogramming-in-es6-symbols/
 
 ### My views:
 
