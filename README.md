@@ -29,12 +29,27 @@ So Javascript is a general purpose scripting language that conforms (comply with
 
 <b>Fun Fact:</b> When Javascript was being introduced, the Java language was really popular in market and someone throught it was a good idea to try to ride along on this success and name it as Java-script.
 
+### Understanding Javascript Engine and Javascript Runtime
+When talking about Javascript there are 2 things which needs to be known for better understanding. Before we talk about that you need to understand one thing that at first Javascript was introduced for web browser but later things changed. Now whenever we need to run any piece of code in Javascript then we need Javascript Engine
+
+Generally javascript engine should do 2 things:<br>
+1. [Parsing](https://en.wikipedia.org/wiki/Parsing) and converting your code to runnable commands<br>
+2. Using Environment object to interact
+
+Second is Javascript Runtime environment which can be thought of as where the Engine is running but in depth the runtime environment provides the built-in libraries that are available to the program at runtime (during execution)
+
+For example V8 (Javascript engine) is used by both Chrome Browser and NodeJS but their runtime can be different as:<br>
+1. Chrome which have the window with DOM objects<br>
+2. Node with processes, buffers and more
+
+This was just an overview of what happens behind the scene but later we will how exactly it works after understanding javascript in general.
+
 ## Understanding Javascript
 
-We just understood exactly what is Javascript but at the end when you see different explanation of it and then we see some new terms which is so hard to understand but in short the key words are important thing in definition for example:
+We just understood exactly what is Javascript but at the end when you see different explanation of it and then we see some new terms which is so hard to understand but in short the key words are important thing in definition so let's understand it one by one:
 
 #### 1. Lightweight Interpreted
-Fairly simple to use and have not many constructs but yes after ECMAScript 5 it is getting much more complex heavier with all the dependencies [Link](https://coderanch.com/t/631906/languages/javascript-lightweight-programming-language)
+It means Javascript is fairly simple to use and have not many constructs but yes after ECMAScript 5 it is getting much more complex heavier with all the dependencies [Link](https://coderanch.com/t/631906/languages/javascript-lightweight-programming-language)
 #### 2. JIT compiled programming language
 Javascript started out slow in earlier days but it was fixed by using JIT compilers<br>
 One of the major problems of interpreter were that in loop, the same code was executed over and over again which is time consuming but again the feature of interpreter is best fit for Javascript.
@@ -1156,20 +1171,6 @@ foo = function() {
 }
 ```
 
-#### Fact: Functions are First class objects
-
-In short Functions are objects, which means they inherit from the Object prototype and they can be assigned key: value pairs or can be returned from functions. They can be assigned to variables or pass around as arguments. But why it matters ? Because you can do great things like callback functions with event listners, closures are also something which we can use.
-
-### Understanding Javascript Engine and Javascript Runtime
-Generally javascript engine should do 2 things:<br>
-1. [Parsing](https://en.wikipedia.org/wiki/Parsing) and converting your code to runnable commands<br>
-2. Using Environment object to interact
-
-So here 2 things are in action. First is Javascript Engine and second is Javascript Runtime. For example V8 engine is used by both Chrome Browser and NodeJS but their runtime can be different as:<br>
-1. Chrome which have the window with DOM objects<br>
-2. Node with processes, buffers and more
-
-
 One good question can be raised is:
 
 [How does hoisting work if JavaScript is an interpreted language?](https://stackoverflow.com/questions/45620041/how-does-hoisting-work-if-javascript-is-an-interpreted-language)<br>
@@ -1232,6 +1233,7 @@ https://codeburst.io/imperative-vs-declarative-javascript-8b5e45a602dd<br>
 https://stackoverflow.com/questions/36797206/what-is-the-symbol-primitive-data-type-in-javascript<br>
 https://stackoverflow.com/questions/21724326/what-is-the-motivation-for-bringing-symbols-to-es6<br>
 https://www.keithcirkel.co.uk/metaprogramming-in-es6-symbols/<br>
+https://medium.com/@sharangohar/how-javascript-works-behind-the-scenes-fb65b81d6e1c<br>
 
 https://www.youtube.com/watch?v=8aGhZQkoFbQ<br>
 (Thanks to https://stackoverflow.com/questions/54503435/whats-the-order-of-execution-of-javascript-code-internally#comment95810892_54503435)
