@@ -148,7 +148,7 @@ Now the properties can be accessed in 2 ways:
 1. Using dot notation which means it will fetches the property of value named.
 2. Using square bracket notation which means the value named between brackets is evaluated to get the property name, means result is converted to a string as the property name.
 
-<b>Note:</b> In string we usually see that we can execute `"a".length` even if string is primitive and thats because language means javascript "boxes" the primitives in their object wrappers when appropriate. And it can be best seen with numbers where you won't be able to execute `27.toString()` which is a bit ccomplicated because of vagaries of the token grammar but it is possible if `a=27` and `a.toString()` or like `(27).toString()`.
+<b>Note:</b> In string we usually see that we can execute `"a".length` even if string is primitive and thats because language means javascript "boxes" the primitives in their object wrappers when appropriate. And it can be best seen with numbers where you won't be able to execute `27.toString()` which is a bit complicated because of vagaries of the token grammar but it is possible if `a=27` and `a.toString()` or like `(27).toString()`.
 
 In short except of `null` and `undefined` all primitive values have object equivalents that wrap around the primitive values. 
 
@@ -190,7 +190,9 @@ Objects are nothing but associative array which have key-value pairs where prope
 
 Any code that produces value is called an expression (any int/char) but statement is a complete line of code that performs some action. Now these internal state are remembered by using bindings which binds the value. Here in Javascript binding is like as tentacles rather than boxes. It means that they do not store but grasp them. If there is nothing to grasp then undefined is assigned.
 
-Generally binding is possible by using `var`, `let` and `const`. Now the collection of bindings and their values that exist at a given tiime is called the environment. By starting these environment are not empty but by default have bindings that are part of the language standard and at the same time also have bindings that provide ways to interact with the surroundings system for example in a browser like onclick or keyboard input.
+Generally binding is possible by using `var`, `let` and `const`. Now the collection of bindings and their values that exist at a given tiime is called the environment. By starting these environment are not empty but by default they have bindings that are part of the language standard and at the same time they also have bindings that provide ways to interact with the surroundings system for example in a browser like onclick or keyboard input.
+
+Environments are really a great concept to understand and we will under later at their respective section.
 
 #### Next we talk about control flow, conditional execution, while and do loops, for loops, switch, comments which are quite common
 
